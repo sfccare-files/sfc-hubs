@@ -15,40 +15,57 @@ width:100%;
 
 #searchBox{
 width:320px;
+max-width:90%;
 padding:10px;
 margin-bottom:10px;
 font-size:14px;
 }
 
+/* POPUP CONTAINER */
+
 .hub-popup{
-width:380px;
+width:100%;
+max-width:340px;
 font-family:Arial;
 }
+
+/* TITLE */
 
 .title{
 text-align:center;
 border-bottom:2px solid black;
-padding-bottom:5px;
+padding-bottom:6px;
 margin-bottom:10px;
 }
 
+/* DATA BOX */
+
 .box{
 background:#d9d9d9;
-padding:6px;
+padding:8px;
 border-radius:6px;
 margin-bottom:6px;
 font-size:13px;
+
+word-wrap:break-word;
+overflow-wrap:break-word;
 }
+
+/* FULL WIDTH BOX */
 
 .full{
 width:100%;
 }
 
+/* GRID LAYOUT */
+
 .grid2{
 display:grid;
-grid-template-columns:1fr 1fr;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
 gap:6px;
 }
+
+/* CONTACT SECTION */
 
 .section{
 background:#bfbfbf;
@@ -59,11 +76,29 @@ margin-bottom:8px;
 font-weight:bold;
 }
 
+/* DIRECTION BUTTON */
+
 .direction-btn{
 background:#2f7d57;
 color:white;
-padding:8px 14px;
+padding:10px 16px;
 border-radius:8px;
 text-decoration:none;
 font-weight:bold;
+display:inline-block;
+margin-top:5px;
+}
+
+/* MOBILE OPTIMIZATION */
+
+@media (max-width:480px){
+
+.grid2{
+grid-template-columns:1fr;
+}
+
+.hub-popup{
+max-width:100%;
+}
+
 }
