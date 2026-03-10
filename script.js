@@ -7,11 +7,36 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 var markers = L.markerClusterGroup();
 var hubMarkers = [];
 
-fetch("hubs.json")
-.then(res => res.json())
-.then(data => {
+fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vSYDLFsB6QUf0Vf0kL-COmVR3eh0jXOLnBG1r6stjL7hVf8-kvpV-KjCAv9R9QKAO0C6E00XGfw7I0q/pub?output=csv")
+.then(response => response.text())
+.then(csv => {
 
-data.forEach(hub => {
+const rows = csv.split("\n").slice(1);
+
+rows.forEach(row => {
+
+const cols = row.split(",");
+
+if(cols.length < 10) return;
+
+const hub = {
+name: cols[0],
+hub_id: cols[1],
+zone: cols[2],
+district: cols[3],
+division: cols[4],
+lat: parseFloat(cols[5]),
+lng: parseFloat(cols[6]),
+address: cols[7],
+hub_ip: cols[8],
+hub_phone: cols[9],
+manager: cols[10],
+manager_phone: cols[11],
+assistant_manager: cols[12],
+assistant_manager_phone: cols[13],
+hub_assistant: cols[14],
+hub_assistant_phone: cols[15]
+};
 
 var marker = L.marker([hub.lat, hub.lng]);
 
@@ -21,7 +46,6 @@ var popup = `
 <h2 class="title">Hub Details</h2>
 
 <div class="box full"><b>Name:</b> ${hub.name}</div>
-
 <div class="box full"><b>Address:</b> ${hub.address}</div>
 
 <div class="grid2">
@@ -59,7 +83,7 @@ var popup = `
 
 <div class="grid2">
 <div class="box"><b>Hub Asst:</b> ${hub.hub_assistant}</div>
-<div class="box"><b>Phone:</b> ${hub.hub_assistant_phone}</div>
+<div class="box"><b>Phone:</b> ${hub_assistant_phone}</div>
 </div>
 
 <hr>
@@ -87,8 +111,6 @@ hubMarkers.push(marker);
 map.addLayer(markers);
 
 });
-
-/* SEARCH SYSTEM */
 
 document.getElementById("searchBox").addEventListener("keyup",function(){
 
