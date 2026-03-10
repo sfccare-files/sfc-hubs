@@ -1,0 +1,29 @@
+[
+{
+"name":"Dhaka Central Hub",
+"lat":23.7806,
+"lng":90.4070,
+"address":"Gulshan 1, Dhaka",
+"hub_phone":"01700000000",
+"manager":"Rahim Ahmed",
+"manager_phone":"01800000000"
+},
+{
+"name":"Gazipur Hub",
+"lat":23.9999,
+"lng":90.4203,
+"address":"Gazipur City",
+"hub_phone":"01700000001",
+"manager":"Karim Hasan",
+"manager_phone":"01800000001"
+},
+{
+"name":"Chattogram Hub",
+"lat":22.3569,
+"lng":91.7832,
+"address":"Agrabad, Chattogram",
+"hub_phone":"01700000002",
+"manager":"Sajid Khan",
+"manager_phone":"01800000002"
+}
+]
