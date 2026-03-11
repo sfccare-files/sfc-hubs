@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
   <meta charset="utf-8">
   <title>SFC Hub Locator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
@@ -11,64 +11,28 @@
 
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <div class="app-shell">
+  <h2 class="main-title">SFC Hub Locator</h2>
 
-    <header class="top-header">
-      <div class="brand-area">
-        <div class="brand-logo">SteadFast</div>
-        <div class="brand-sub">Courier</div>
-      </div>
+  <div class="top-bar">
+    <input id="searchBox" type="text" placeholder="Search Hub Name...">
+  </div>
 
-      <div class="header-time" id="liveDateTime"></div>
-
-      <div class="header-search">
-        <input id="searchBox" type="text" placeholder="Search Hub">
-        <span class="search-icon">⌕</span>
-      </div>
-    </header>
-
-    <div class="main-layout">
-
-      <aside class="left-sidebar">
-        <button class="dashboard-btn">Dashboard</button>
-
-        <div class="nav-section">
-          <div class="nav-title">▼ Hub List</div>
-
-          <div class="nav-group">
-            <div class="nav-group-title">▼ Hubs</div>
-            <div id="hubList" class="hub-list"></div>
-          </div>
-
-          <div class="nav-group">
-            <div class="nav-group-title">▼ Zones</div>
-            <div id="zoneList" class="mini-list"></div>
-          </div>
-
-          <div class="nav-group">
-            <div class="nav-group-title">▼ Districts</div>
-            <div id="districtList" class="mini-list"></div>
-          </div>
-
-          <div class="nav-group">
-            <div class="nav-group-title">▼ Divisions</div>
-            <div id="divisionList" class="mini-list"></div>
-          </div>
-        </div>
-      </aside>
-
-      <main class="map-panel">
-        <div id="map"></div>
-      </main>
-
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-title">Hub List</div>
+      <div id="hubList"></div>
     </div>
+
+    <div id="map"></div>
   </div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="script.js"></script>
+
 </body>
 </html>
