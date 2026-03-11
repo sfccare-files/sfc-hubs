@@ -1,21 +1,45 @@
-// Initialize map
+// =========================
+// MAP INIT
+// =========================
 var map = L.map('map').setView([23.6850, 90.3563], 7);
 
-// Map tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// Marker cluster
 var markers = L.markerClusterGroup();
-var hubMarkers = [];
 var allHubs = [];
 
-// Google Sheet CSV
+// =========================
+// LIVE TIME
+// =========================
+function updateDateTime(){
+  const now = new Date();
+  const options = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  };
+  document.getElementById('liveDateTime').textContent =
+    now.toLocaleString('en-US', options);
+}
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+// =========================
+// GOOGLE SHEET CSV
+// =========================
 const sheetURL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSYDLFsB6QUf0Vf0kL-COmVR3eh0jXOLnBG1r6stjL7hVf8-kvpV-KjCAv9R9QKAO0C6E00XGfw7I0q/pub?output=csv";
 
-// Parse CSV
+// =========================
+// LOAD DATA
+// =========================
 Papa.parse(sheetURL, {
   download: true,
   header: true,
@@ -30,15 +54,13 @@ Papa.parse(sheetURL, {
 
       if (isNaN(lat) || isNaN(lng)) return;
 
-      var marker = L.marker([lat, lng]);
+      const marker = L.marker([lat, lng]);
 
-      var popup = `
+      const popup = `
         <div class="hub-popup">
-
           <h2 class="title">Hub Details</h2>
 
           <div class="box"><b>Name:</b> ${hub.name || ""}</div>
-
           <div class="box"><b>Address:</b> ${hub.address || ""}</div>
 
           <div class="grid2">
@@ -51,9 +73,7 @@ Papa.parse(sheetURL, {
             <div class="box"><b>Division:</b> ${hub.division || ""}</div>
           </div>
 
-          <div class="box">
-            <b>Coordinates:</b> ${lat}, ${lng}
-          </div>
+          <div class="box"><b>Coordinates:</b> ${lat}, ${lng}</div>
 
           <hr>
 
@@ -86,7 +106,6 @@ Papa.parse(sheetURL, {
               📍 Get Directions
             </button>
           </div>
-
         </div>
       `;
 
@@ -96,11 +115,7 @@ Papa.parse(sheetURL, {
         className: "custom-popup"
       });
 
-      marker.hubName = (hub.name || "").toLowerCase();
-      marker.hubData = hub;
-
       markers.addLayer(marker);
-      hubMarkers.push(marker);
 
       allHubs.push({
         name: hub.name || "",
@@ -113,20 +128,19 @@ Papa.parse(sheetURL, {
 
     map.addLayer(markers);
     renderHubList(allHubs);
+    renderMiniLists(allHubs);
   }
 });
 
-// Render sidebar list
-function renderHubList(hubs) {
+// =========================
+// SIDEBAR RENDER
+// =========================
+function renderHubList(hubs){
   const hubList = document.getElementById("hubList");
   hubList.innerHTML = "";
 
-  if (hubs.length === 0) {
-    hubList.innerHTML = `
-      <div class="hub-item">
-        <div class="hub-item-name">No hubs found</div>
-      </div>
-    `;
+  if(hubs.length === 0){
+    hubList.innerHTML = `<div class="hub-item">No hubs found</div>`;
     return;
   }
 
@@ -135,15 +149,10 @@ function renderHubList(hubs) {
     item.className = "hub-item";
 
     item.innerHTML = `
-      <div class="hub-item-name">${hub.name}</div>
-      <div class="hub-item-meta">
-        Zone: ${hub.zone}<br>
-        District: ${hub.district}<br>
-        Division: ${hub.division}
-      </div>
+      <span class="hub-link">▣ ${hub.name}</span>
     `;
 
-    item.addEventListener("click", function() {
+    item.addEventListener("click", function(){
       map.setView(hub.marker.getLatLng(), 12);
       hub.marker.openPopup();
     });
@@ -152,8 +161,25 @@ function renderHubList(hubs) {
   });
 }
 
-// Search: filter sidebar only
-document.getElementById("searchBox").addEventListener("keyup", function() {
+function renderMiniLists(hubs){
+  const zones = [...new Set(hubs.map(h => h.zone).filter(Boolean))].sort();
+  const districts = [...new Set(hubs.map(h => h.district).filter(Boolean))].sort();
+  const divisions = [...new Set(hubs.map(h => h.division).filter(Boolean))].sort();
+
+  document.getElementById("zoneList").innerHTML =
+    zones.map(z => `<div class="mini-item">▣ ${z}</div>`).join("");
+
+  document.getElementById("districtList").innerHTML =
+    districts.map(d => `<div class="mini-item">▣ ${d}</div>`).join("");
+
+  document.getElementById("divisionList").innerHTML =
+    divisions.map(d => `<div class="mini-item">▣ ${d}</div>`).join("");
+}
+
+// =========================
+// SEARCH
+// =========================
+document.getElementById("searchBox").addEventListener("keyup", function(){
   const value = this.value.toLowerCase().trim();
 
   const filtered = allHubs.filter(hub =>
@@ -163,8 +189,10 @@ document.getElementById("searchBox").addEventListener("keyup", function() {
   renderHubList(filtered);
 });
 
-// Google Maps direction
-function openDirections(lat, lng) {
+// =========================
+// DIRECTIONS
+// =========================
+function openDirections(lat, lng){
   const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
   window.open(url, "_blank");
 }
