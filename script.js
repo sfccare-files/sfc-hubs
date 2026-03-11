@@ -6,15 +6,15 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
  attribution:'© OpenStreetMap'
 }).addTo(map);
 
-// Marker cluster group
+// Marker cluster
 var markers = L.markerClusterGroup();
 var hubMarkers = [];
 
-// Google Sheet CSV link
+// Google Sheet CSV
 const sheetURL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vSYDLFsB6QUf0Vf0kL-COmVR3eh0jXOLnBG1r6stjL7hVf8-kvpV-KjCAv9R9QKAO0C6E00XGfw7I0q/pub?output=csv";
 
-// Parse CSV safely
+// Parse CSV
 Papa.parse(sheetURL,{
  download:true,
  header:true,
@@ -39,9 +39,9 @@ Papa.parse(sheetURL,{
 
  <h2 class="title">Hub Details</h2>
 
- <div class="box full"><b>Name:</b> ${hub.name}</div>
+ <div class="box"><b>Name:</b> ${hub.name}</div>
 
- <div class="box full"><b>Address:</b> ${hub.address}</div>
+ <div class="box"><b>Address:</b> ${hub.address}</div>
 
  <div class="grid2">
  <div class="box"><b>Hub ID:</b> ${hub.hub_id}</div>
@@ -53,7 +53,7 @@ Papa.parse(sheetURL,{
  <div class="box"><b>Division:</b> ${hub.division}</div>
  </div>
 
- <div class="box full">
+ <div class="box">
  <b>Coordinates:</b> ${lat}, ${lng}
  </div>
 
@@ -84,11 +84,10 @@ Papa.parse(sheetURL,{
  <hr>
 
  <div style="text-align:center;">
- <a class="direction-btn"
- target="_blank"
- href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}">
- Get Directions
- </a>
+ <button class="direction-btn"
+ onclick="openDirections(${lat},${lng})">
+ 📍 Get Directions
+ </button>
  </div>
 
  </div>
@@ -96,8 +95,8 @@ Papa.parse(sheetURL,{
 
  marker.bindPopup(popup,{
  maxWidth:360,
- minWidth:300,
- autoPan:true
+ minWidth:360,
+ className:"custom-popup"
  });
 
  marker.hubName = (hub.name || "").toLowerCase();
@@ -112,7 +111,7 @@ Papa.parse(sheetURL,{
  }
 });
 
-// Search
+// Search function
 document.getElementById("searchBox").addEventListener("keyup",function(){
 
 var value = this.value.toLowerCase();
@@ -127,3 +126,12 @@ hubMarkers.forEach(marker=>{
 });
 
 });
+
+// Google Maps direction
+function openDirections(lat,lng){
+
+const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+window.open(url,"_blank");
+
+}

@@ -21,15 +21,25 @@ margin-bottom:10px;
 font-size:14px;
 }
 
-/* POPUP CONTAINER */
+/* Popup container */
+
+.custom-popup .leaflet-popup-content-wrapper{
+padding:0;
+border-radius:12px;
+}
+
+.custom-popup .leaflet-popup-content{
+margin:0;
+width:360px !important;
+}
+
+/* Popup layout */
 
 .hub-popup{
 width:100%;
-max-width:340px;
+padding:12px;
 box-sizing:border-box;
 }
-
-/* TITLE */
 
 .title{
 text-align:center;
@@ -38,8 +48,6 @@ padding-bottom:6px;
 margin-bottom:10px;
 }
 
-/* DATA BOX */
-
 .box{
 background:#d9d9d9;
 padding:8px;
@@ -47,17 +55,12 @@ border-radius:6px;
 margin-bottom:6px;
 font-size:13px;
 
-/* IMPORTANT FIX */
-box-sizing:border-box;
 width:100%;
-min-width:0;
+box-sizing:border-box;
 
-/* allow text wrap */
 word-break:break-word;
 overflow-wrap:anywhere;
 }
-
-/* GRID LAYOUT */
 
 .grid2{
 display:grid;
@@ -66,7 +69,9 @@ gap:6px;
 width:100%;
 }
 
-/* CONTACT HEADER */
+.grid2 .box{
+min-width:0;
+}
 
 .section{
 background:#bfbfbf;
@@ -77,20 +82,50 @@ margin-bottom:8px;
 font-weight:bold;
 }
 
-/* BUTTON */
+/* Button */
 
 .direction-btn{
+
 background:#2f7d57;
-color:white;
-padding:10px 16px;
+color:#ffffff;
+
+padding:10px 18px;
+
+font-size:14px;
+font-weight:600;
+
 border-radius:8px;
-text-decoration:none;
-font-weight:bold;
-display:inline-block;
-margin-top:5px;
+border:none;
+
+cursor:pointer;
+
+transition:all .2s ease;
+
 }
 
-/* MOBILE */
+/* Hover */
+
+.direction-btn:hover{
+
+background:#256447;
+
+transform:translateY(-2px);
+
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+
+}
+
+/* Click */
+
+.direction-btn:active{
+
+transform:translateY(0);
+
+box-shadow:none;
+
+}
+
+/* Mobile */
 
 @media (max-width:480px){
 
@@ -98,8 +133,8 @@ margin-top:5px;
 grid-template-columns:1fr;
 }
 
-.hub-popup{
-max-width:100%;
+.custom-popup .leaflet-popup-content{
+width:100% !important;
 }
 
 }
