@@ -52,6 +52,7 @@ body{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-left: 50px;
 }
 
 .header-search{
@@ -59,6 +60,7 @@ body{
   display: flex;
   justify-content: center;
   align-items: center;
+  transform: translateX(-50px);
 }
 
 #searchBox{
@@ -79,7 +81,7 @@ body{
 
 .search-icon{
   position: absolute;
-  right: 18px;
+  right: 30px;
   font-size: 20px;
   color: #777;
   pointer-events: none;
