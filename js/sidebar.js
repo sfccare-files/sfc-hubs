@@ -3,9 +3,9 @@ function renderTrees(hubs) {
   const districts = [...new Set(hubs.map(h => h.district).filter(Boolean))].sort();
   const zones = [...new Set(hubs.map(h => h.zone).filter(Boolean))].sort();
 
-  renderSimpleTree("divisionTree", divisions);
-  renderSimpleTree("districtTree", districts);
-  renderSimpleTree("zoneTree", zones);
+  renderClickableTree("divisionTree", divisions, setDivisionFilter);
+  renderClickableTree("districtTree", districts, setDistrictFilter);
+  renderClickableTree("zoneTree", zones, setZoneFilter);
   renderHubTree(hubs);
 }
 
@@ -38,7 +38,7 @@ function renderHubTree(hubs) {
   });
 }
 
-function renderSimpleTree(containerId, items) {
+function renderClickableTree(containerId, items, clickHandler) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
@@ -52,7 +52,16 @@ function renderSimpleTree(containerId, items) {
   items.forEach(item => {
     const row = document.createElement("div");
     row.className = "tree-item";
-    row.textContent = item;
+
+    const link = document.createElement("span");
+    link.className = "tree-link";
+    link.textContent = item;
+
+    link.addEventListener("click", function() {
+      clickHandler(item);
+    });
+
+    row.appendChild(link);
     container.appendChild(row);
   });
 }

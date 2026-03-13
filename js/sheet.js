@@ -38,11 +38,13 @@ function loadHubData() {
           zone: hub.zone || "",
           district: hub.district || "",
           division: hub.division || "",
-          marker: marker
+          marker: marker,
+          raw: hub
         });
       });
 
       renderTrees(allHubs);
+      updateVisibleMarkers(allHubs);
     },
     error: function() {
       const hubTree = document.getElementById("hubTree");
