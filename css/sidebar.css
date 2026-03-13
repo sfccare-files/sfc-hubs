@@ -37,7 +37,8 @@
 }
 
 .clear-filters-btn:hover{
-  background: #1fc17a;
+  background: #333;
+  color: #fff;
 }
 
 .tree-wrap{
