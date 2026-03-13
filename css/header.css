@@ -1,0 +1,82 @@
+.top-header{
+  height: 60px;
+  display: grid;
+  grid-template-columns: 165px 1fr 300px;
+  align-items: center;
+  padding: 0 14px;
+  background: #efefef;
+  border-bottom: 1px solid #9f9f9f;
+  gap: 18px;
+}
+
+.brand-wrap{
+  position: relative;
+  width: 150px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.brand-logo{
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 700;
+  color: #4a4a4a;
+  line-height: 1;
+  user-select: none;
+}
+
+.brand-sub{
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #7a7a7a;
+  margin-left: 82px;
+  margin-top: -4px;
+  line-height: 1;
+  user-select: none;
+}
+
+.header-time{
+  text-align: left;
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 50px;
+}
+
+.header-search{
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateX(-50px);
+}
+
+#searchBox{
+  width: 270px;
+  height: 34px;
+  padding: 0 42px 0 18px;
+  border: 1px solid #a9a9a9;
+  border-radius: 18px;
+  background: #f7f7f7;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+#searchBox::placeholder{
+  color: #8a8a8a;
+}
+
+.search-icon{
+  position: absolute;
+  right: 30px;
+  font-size: 20px;
+  color: #777;
+  pointer-events: none;
+  user-select: none;
+}
