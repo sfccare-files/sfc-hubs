@@ -22,4 +22,5 @@ setInterval(updateDateTime, 1000);
 
 initTreeToggles();
 initSearch();
+initClearFilters();
 loadHubData();
