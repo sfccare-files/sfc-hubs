@@ -4,6 +4,42 @@
   width: 100%;
 }
 
+.map-panel{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #efefef;
+}
+
+.stats-bar{
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #dddddd;
+  background: #f7f7f7;
+}
+
+.stat-card{
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.stat-label{
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.stat-value{
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+}
+
 #map{
   flex: 1;
   height: 100%;

@@ -53,6 +53,7 @@ function applyFilters() {
   updateVisibleMarkers(filtered);
   renderTrees(allHubs);
   fitMapToFilteredHubs(filtered);
+  updateStats(filtered);
 }
 
 function clearLowerFilters(level) {
@@ -117,6 +118,7 @@ function clearAllFilters() {
   updateVisibleMarkers(allHubs);
   renderTrees(allHubs);
   fitMapToFilteredHubs(allHubs);
+  updateStats(allHubs);
   resetAllSections();
 }
 

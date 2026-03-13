@@ -28,6 +28,10 @@
     border-bottom: 1px solid #ddd;
   }
 
+  .stats-bar{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   #map{
     height: 70vh;
   }
@@ -49,5 +53,9 @@
   #searchBox{
     width: 100%;
     max-width: 280px;
+  }
+
+  .stats-bar{
+    grid-template-columns: 1fr;
   }
 }

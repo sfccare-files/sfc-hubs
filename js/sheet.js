@@ -45,6 +45,7 @@ function loadHubData() {
 
       renderTrees(allHubs);
       updateVisibleMarkers(allHubs);
+      updateStats(allHubs);
     },
     error: function() {
       const hubTree = document.getElementById("hubTree");

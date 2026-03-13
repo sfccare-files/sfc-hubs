@@ -8,6 +8,7 @@ function initSearch() {
     updateVisibleMarkers(filtered);
     renderTrees(allHubs);
     fitMapToFilteredHubs(filtered);
+    updateStats(filtered);
 
     if (this.value.trim() !== "") {
       openSection("hubTree");

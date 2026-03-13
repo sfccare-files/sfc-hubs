@@ -75,7 +75,36 @@
       </div>
     </div>
 
-    <div id="map"></div>
+    <div class="map-panel">
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-label">Total Hubs</div>
+          <div class="stat-value" id="totalHubsCount">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Visible Hubs</div>
+          <div class="stat-value" id="visibleHubsCount">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Divisions</div>
+          <div class="stat-value" id="divisionCount">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Districts</div>
+          <div class="stat-value" id="districtCount">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Zones</div>
+          <div class="stat-value" id="zoneCount">0</div>
+        </div>
+      </div>
+
+      <div id="map"></div>
+    </div>
   </div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -88,6 +117,7 @@
   <script src="js/filters.js"></script>
   <script src="js/search.js"></script>
   <script src="js/sheet.js"></script>
+  <script src="js/stats.js"></script>
   <script src="js/app.js"></script>
 
 </body>
