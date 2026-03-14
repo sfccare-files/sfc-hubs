@@ -42,7 +42,6 @@ function renderHubTree(hubs) {
       renderTrees();
       map.setView(hub.marker.getLatLng(), 12);
       hub.marker.openPopup();
-      openRelatedSections("hubTree");
     });
 
     item.appendChild(link);
@@ -178,37 +177,4 @@ function resetAllSections() {
   closeSection("districtTree");
   closeSection("zoneTree");
   closeSection("hubTree");
-}
-
-function openRelatedSections(targetId) {
-  if (targetId === "divisionTree") {
-    openSection("divisionTree");
-    openSection("districtTree");
-    openSection("zoneTree");
-    openSection("hubTree");
-    return;
-  }
-
-  if (targetId === "districtTree") {
-    openSection("divisionTree");
-    openSection("districtTree");
-    openSection("zoneTree");
-    openSection("hubTree");
-    return;
-  }
-
-  if (targetId === "zoneTree") {
-    openSection("divisionTree");
-    openSection("districtTree");
-    openSection("zoneTree");
-    openSection("hubTree");
-    return;
-  }
-
-  if (targetId === "hubTree") {
-    openSection("divisionTree");
-    openSection("districtTree");
-    openSection("zoneTree");
-    openSection("hubTree");
-  }
 }

@@ -51,17 +51,13 @@ function getCrossFilteredValues() {
   };
 }
 
-function applyFilters(openTargetId) {
+function applyFilters() {
   const filtered = getFilteredHubs();
 
   updateVisibleMarkers(filtered);
   renderTrees();
   fitMapToFilteredHubs(filtered);
   updateStats(filtered);
-
-  if (openTargetId) {
-    openRelatedSections(openTargetId);
-  }
 }
 
 function setDivisionFilter(value) {
@@ -73,13 +69,13 @@ function setDivisionFilter(value) {
     clearActiveSelection("district");
     clearActiveSelection("zone");
     clearActiveSelection("hub");
-    applyFilters("divisionTree");
+    applyFilters();
     return;
   }
 
   activeFilters.division = value;
   setActiveSelection("division", value);
-  applyFilters("divisionTree");
+  applyFilters();
 }
 
 function setDistrictFilter(value) {
@@ -89,13 +85,13 @@ function setDistrictFilter(value) {
     clearActiveSelection("district");
     clearActiveSelection("zone");
     clearActiveSelection("hub");
-    applyFilters("districtTree");
+    applyFilters();
     return;
   }
 
   activeFilters.district = value;
   setActiveSelection("district", value);
-  applyFilters("districtTree");
+  applyFilters();
 }
 
 function setZoneFilter(value) {
@@ -103,13 +99,13 @@ function setZoneFilter(value) {
     activeFilters.zone = "";
     clearActiveSelection("zone");
     clearActiveSelection("hub");
-    applyFilters("zoneTree");
+    applyFilters();
     return;
   }
 
   activeFilters.zone = value;
   setActiveSelection("zone", value);
-  applyFilters("zoneTree");
+  applyFilters();
 }
 
 function clearAllFilters() {
