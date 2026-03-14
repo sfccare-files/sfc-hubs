@@ -5,6 +5,7 @@ function renderTrees() {
   renderClickableTree("districtTree", data.districts, setDistrictFilter, "district");
   renderClickableTree("zoneTree", data.zones, setZoneFilter, "zone");
   renderHubTree(data.hubs);
+  updateSidebarCounts(data);
 }
 
 function renderHubTree(hubs) {
@@ -79,6 +80,33 @@ function renderClickableTree(containerId, items, clickHandler, type) {
     row.appendChild(link);
     container.appendChild(row);
   });
+}
+
+function updateSidebarCounts(data) {
+  const divisionTreeCount = document.getElementById("divisionTreeCount");
+  const districtTreeCount = document.getElementById("districtTreeCount");
+  const zoneTreeCount = document.getElementById("zoneTreeCount");
+  const hubTreeCount = document.getElementById("hubTreeCount");
+
+  const divisionRailCount = document.getElementById("divisionRailCount");
+  const districtRailCount = document.getElementById("districtRailCount");
+  const zoneRailCount = document.getElementById("zoneRailCount");
+  const hubRailCount = document.getElementById("hubRailCount");
+
+  const divisionCount = data.divisions.length;
+  const districtCount = data.districts.length;
+  const zoneCount = data.zones.length;
+  const hubCount = data.hubs.length;
+
+  if (divisionTreeCount) divisionTreeCount.textContent = divisionCount;
+  if (districtTreeCount) districtTreeCount.textContent = districtCount;
+  if (zoneTreeCount) zoneTreeCount.textContent = zoneCount;
+  if (hubTreeCount) hubTreeCount.textContent = hubCount;
+
+  if (divisionRailCount) divisionRailCount.textContent = divisionCount;
+  if (districtRailCount) districtRailCount.textContent = districtCount;
+  if (zoneRailCount) zoneRailCount.textContent = zoneCount;
+  if (hubRailCount) hubRailCount.textContent = hubCount;
 }
 
 function initTreeToggles() {

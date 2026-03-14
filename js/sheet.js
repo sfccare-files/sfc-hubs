@@ -70,7 +70,6 @@ function loadHubData() {
 
       renderTrees();
       updateVisibleMarkers(allHubs);
-      updateStats(allHubs);
       hideLoadingScreen();
     },
     error: function() {

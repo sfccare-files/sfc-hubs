@@ -4,10 +4,6 @@
     gap: 16px;
     padding: 0 16px;
   }
-
-  .stats-bar{
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 992px){
@@ -68,10 +64,6 @@
     margin: 14px;
   }
 
-  .stats-bar{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   #map{
     min-height: 65vh;
   }
@@ -107,30 +99,12 @@
     font-size: 16px;
   }
 
-  .stats-bar{
-    gap: 10px;
-    padding: 10px;
-  }
-
-  .stat-card{
-    padding: 10px 8px;
-    border-radius: 14px;
-  }
-
-  .stat-value{
-    font-size: 18px;
-  }
-
   #map{
     min-height: 58vh;
   }
 }
 
 @media (max-width: 560px){
-  .stats-bar{
-    grid-template-columns: 1fr 1fr;
-  }
-
   .grid2{
     grid-template-columns: 1fr;
   }
@@ -189,19 +163,6 @@
   .map-panel{
     margin: 10px;
     border-radius: 16px;
-  }
-
-  .stats-bar{
-    grid-template-columns: 1fr;
-    padding: 10px;
-  }
-
-  .stat-card{
-    padding: 10px;
-  }
-
-  .stat-value{
-    font-size: 17px;
   }
 
   #map{

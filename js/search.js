@@ -8,10 +8,5 @@ function initSearch() {
     updateVisibleMarkers(filtered);
     renderTrees();
     fitMapToFilteredHubs(filtered);
-    updateStats(filtered);
-
-    if (this.value.trim() !== "") {
-      openRelatedSections("hubTree");
-    }
   });
 }

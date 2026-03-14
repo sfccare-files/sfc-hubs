@@ -57,7 +57,6 @@ function applyFilters() {
   updateVisibleMarkers(filtered);
   renderTrees();
   fitMapToFilteredHubs(filtered);
-  updateStats(filtered);
 }
 
 function setDivisionFilter(value) {
@@ -124,7 +123,6 @@ function clearAllFilters() {
   updateVisibleMarkers(allHubs);
   renderTrees();
   fitMapToFilteredHubs(allHubs);
-  updateStats(allHubs);
   resetAllSections();
 }
 

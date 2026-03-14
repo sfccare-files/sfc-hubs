@@ -58,18 +58,22 @@
 
           <button class="rail-btn" type="button" data-rail-target="divisionTree" title="Divisions">
             <img src="assets/images/division.png" alt="Divisions" class="rail-icon">
+            <span class="rail-badge" id="divisionRailCount">0</span>
           </button>
 
           <button class="rail-btn" type="button" data-rail-target="districtTree" title="Districts">
             <img src="assets/images/district.png" alt="Districts" class="rail-icon">
+            <span class="rail-badge" id="districtRailCount">0</span>
           </button>
 
           <button class="rail-btn" type="button" data-rail-target="zoneTree" title="Zones">
             <img src="assets/images/zone.png" alt="Zones" class="rail-icon">
+            <span class="rail-badge" id="zoneRailCount">0</span>
           </button>
 
           <button class="rail-btn" type="button" data-rail-target="hubTree" title="Hubs">
             <img src="assets/images/Hubs.png" alt="Hubs" class="rail-icon">
+            <span class="rail-badge" id="hubRailCount">0</span>
           </button>
         </div>
 
@@ -83,28 +87,32 @@
           <div class="tree-wrap">
             <div class="tree-section">
               <button class="tree-toggle tree-box" type="button" data-target="divisionTree">
-                <span>Divisions</span>
+                <span class="tree-box-label">Divisions</span>
+                <span class="tree-box-count" id="divisionTreeCount">0</span>
               </button>
               <div id="divisionTree" class="tree-list hidden"></div>
             </div>
 
             <div class="tree-section">
               <button class="tree-toggle tree-box" type="button" data-target="districtTree">
-                <span>Districts</span>
+                <span class="tree-box-label">Districts</span>
+                <span class="tree-box-count" id="districtTreeCount">0</span>
               </button>
               <div id="districtTree" class="tree-list hidden"></div>
             </div>
 
             <div class="tree-section">
               <button class="tree-toggle tree-box" type="button" data-target="zoneTree">
-                <span>Zones</span>
+                <span class="tree-box-label">Zones</span>
+                <span class="tree-box-count" id="zoneTreeCount">0</span>
               </button>
               <div id="zoneTree" class="tree-list hidden"></div>
             </div>
 
             <div class="tree-section">
               <button class="tree-toggle tree-box" type="button" data-target="hubTree">
-                <span>Hubs</span>
+                <span class="tree-box-label">Hubs</span>
+                <span class="tree-box-count" id="hubTreeCount">0</span>
               </button>
               <div id="hubTree" class="tree-list hidden"></div>
             </div>
@@ -113,33 +121,6 @@
       </div>
 
       <div class="map-panel">
-        <div class="stats-bar">
-          <div class="stat-card">
-            <div class="stat-label">Total Hubs</div>
-            <div class="stat-value" id="totalHubsCount">0</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-label">Visible Hubs</div>
-            <div class="stat-value" id="visibleHubsCount">0</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-label">Divisions</div>
-            <div class="stat-value" id="divisionCount">0</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-label">Districts</div>
-            <div class="stat-value" id="districtCount">0</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-label">Zones</div>
-            <div class="stat-value" id="zoneCount">0</div>
-          </div>
-        </div>
-
         <div id="map"></div>
       </div>
     </div>
@@ -155,7 +136,7 @@
   <script src="js/filters.js"></script>
   <script src="js/search.js"></script>
   <script src="js/sheet.js"></script>
-  <script src="js/stats.js"></script>
+  <script src="js/counts.js"></script>
   <script src="js/app.js"></script>
 
 </body>
