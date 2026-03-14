@@ -23,7 +23,7 @@
   <div id="loadingScreen" class="loading-screen">
     <div class="loading-box">
       <img src="assets/images/steadfast-logo.png" alt="SteadFast Courier" class="loading-logo">
-      <div class="loading-text">Loading Hub Details...</div>
+      <div class="loading-text">Loading Hub Data...</div>
       <div class="loading-spinner"></div>
     </div>
   </div>
@@ -43,42 +43,71 @@
     </div>
 
     <div class="layout">
-      <div class="sidebar">
-        <div class="sidebar-title">Hubs List</div>
-
-        <div class="sidebar-actions">
-          <button id="clearFiltersBtn" class="clear-filters-btn" type="button">
-            Clear Filters
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-topbar">
+          <div class="sidebar-title">Hubs List</div>
+          <button id="sidebarToggleBtn" class="sidebar-toggle-btn" type="button" aria-label="Toggle sidebar">
+            ☰
           </button>
         </div>
 
-        <div class="tree-wrap">
-          <div class="tree-section">
-            <button class="tree-toggle tree-box" type="button" data-target="divisionTree">
-              <span>Divisions</span>
+        <div class="sidebar-icon-rail">
+          <button class="rail-btn" type="button" data-rail-action="clear" title="Clear Filters">
+            <img src="assets/images/clear-filter.png" alt="Clear Filters" class="rail-icon">
+          </button>
+
+          <button class="rail-btn" type="button" data-rail-target="divisionTree" title="Divisions">
+            <img src="assets/images/division.png" alt="Divisions" class="rail-icon">
+          </button>
+
+          <button class="rail-btn" type="button" data-rail-target="districtTree" title="Districts">
+            <img src="assets/images/district.png" alt="Districts" class="rail-icon">
+          </button>
+
+          <button class="rail-btn" type="button" data-rail-target="zoneTree" title="Zones">
+            <img src="assets/images/zone.png" alt="Zones" class="rail-icon">
+          </button>
+
+          <button class="rail-btn" type="button" data-rail-target="hubTree" title="Hubs">
+            <img src="assets/images/Hubs.png" alt="Hubs" class="rail-icon">
+          </button>
+        </div>
+
+        <div class="sidebar-body">
+          <div class="sidebar-actions">
+            <button id="clearFiltersBtn" class="clear-filters-btn" type="button">
+              Clear Filters
             </button>
-            <div id="divisionTree" class="tree-list hidden"></div>
           </div>
 
-          <div class="tree-section">
-            <button class="tree-toggle tree-box" type="button" data-target="districtTree">
-              <span>Districts</span>
-            </button>
-            <div id="districtTree" class="tree-list hidden"></div>
-          </div>
+          <div class="tree-wrap">
+            <div class="tree-section">
+              <button class="tree-toggle tree-box" type="button" data-target="divisionTree">
+                <span>Divisions</span>
+              </button>
+              <div id="divisionTree" class="tree-list hidden"></div>
+            </div>
 
-          <div class="tree-section">
-            <button class="tree-toggle tree-box" type="button" data-target="zoneTree">
-              <span>Zones</span>
-            </button>
-            <div id="zoneTree" class="tree-list hidden"></div>
-          </div>
+            <div class="tree-section">
+              <button class="tree-toggle tree-box" type="button" data-target="districtTree">
+                <span>Districts</span>
+              </button>
+              <div id="districtTree" class="tree-list hidden"></div>
+            </div>
 
-          <div class="tree-section">
-            <button class="tree-toggle tree-box" type="button" data-target="hubTree">
-              <span>Hubs</span>
-            </button>
-            <div id="hubTree" class="tree-list hidden"></div>
+            <div class="tree-section">
+              <button class="tree-toggle tree-box" type="button" data-target="zoneTree">
+                <span>Zones</span>
+              </button>
+              <div id="zoneTree" class="tree-list hidden"></div>
+            </div>
+
+            <div class="tree-section">
+              <button class="tree-toggle tree-box" type="button" data-target="hubTree">
+                <span>Hubs</span>
+              </button>
+              <div id="hubTree" class="tree-list hidden"></div>
+            </div>
           </div>
         </div>
       </div>

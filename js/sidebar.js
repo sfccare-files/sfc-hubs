@@ -102,6 +102,51 @@ function initTreeToggles() {
   });
 }
 
+function initSidebarCollapse() {
+  const sidebar = document.getElementById("sidebar");
+  const toggleBtn = document.getElementById("sidebarToggleBtn");
+  if (!sidebar || !toggleBtn) return;
+
+  toggleBtn.addEventListener("click", function() {
+    sidebar.classList.toggle("collapsed");
+
+    setTimeout(function() {
+      if (typeof map !== "undefined") {
+        map.invalidateSize();
+      }
+    }, 260);
+  });
+}
+
+function initSidebarRail() {
+  const sidebar = document.getElementById("sidebar");
+  const railButtons = document.querySelectorAll(".rail-btn");
+  if (!sidebar || railButtons.length === 0) return;
+
+  railButtons.forEach(btn => {
+    btn.addEventListener("click", function() {
+      const action = this.getAttribute("data-rail-action");
+      const target = this.getAttribute("data-rail-target");
+
+      if (action === "clear") {
+        clearAllFilters();
+        return;
+      }
+
+      if (!target) return;
+
+      sidebar.classList.remove("collapsed");
+
+      setTimeout(function() {
+        openSection(target);
+        if (typeof map !== "undefined") {
+          map.invalidateSize();
+        }
+      }, 260);
+    });
+  });
+}
+
 function openSection(targetId) {
   const target = document.getElementById(targetId);
   if (!target) return;

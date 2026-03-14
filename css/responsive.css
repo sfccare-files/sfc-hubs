@@ -38,10 +38,25 @@
     width: calc(100% - 28px);
     min-width: calc(100% - 28px);
     max-width: calc(100% - 28px);
-    height: 260px;
+    height: auto;
+    min-height: 74px;
     margin: 14px;
     margin-bottom: 0;
     border-right: none;
+  }
+
+  .sidebar.collapsed{
+    width: calc(100% - 28px);
+    min-width: calc(100% - 28px);
+    max-width: calc(100% - 28px);
+  }
+
+  .sidebar.collapsed .sidebar-icon-rail{
+    display: none;
+  }
+
+  .sidebar.collapsed .sidebar-body{
+    display: none;
   }
 
   .map-panel{
