@@ -34,12 +34,15 @@
   text-overflow: ellipsis;
   padding-left: 12px;
   min-width: 0;
+  position: relative;
+  left: -50px;
 }
 
 .header-search{
   position: relative;
   width: min(100%, 280px);
   justify-self: end;
+  left: -200px;
 }
 
 #searchBox{
