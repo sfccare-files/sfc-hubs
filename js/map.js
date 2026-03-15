@@ -54,7 +54,7 @@ function focusHubOnMap(hub, zoomLevel) {
   });
 
   setTimeout(function() {
-    hub.marker.openPopup();
+    showHubDetailsPanel(hub);
     pulseMarker(hub.marker);
   }, 350);
 }
@@ -74,4 +74,19 @@ function pulseMarker(marker) {
       marker._icon.classList.remove("selected-hub-marker");
     }
   }, 3000);
+}
+
+function showHubDetailsPanel(hub) {
+  const panel = document.getElementById("hubDetailsPanel");
+  const content = document.getElementById("hubDetailsContent");
+  if (!panel || !content || !hub) return;
+
+  content.innerHTML = buildPopup(hub.raw || hub, hub.marker.getLatLng().lat, hub.marker.getLatLng().lng);
+  panel.classList.remove("hidden");
+}
+
+function hideHubDetailsPanel() {
+  const panel = document.getElementById("hubDetailsPanel");
+  if (!panel) return;
+  panel.classList.add("hidden");
 }

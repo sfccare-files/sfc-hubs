@@ -28,6 +28,13 @@ initClearFilters();
 loadHubData();
 resetAllSections();
 
+const hubDetailsClose = document.getElementById("hubDetailsClose");
+if (hubDetailsClose) {
+  hubDetailsClose.addEventListener("click", function() {
+    hideHubDetailsPanel();
+  });
+}
+
 window.addEventListener("resize", function() {
   if (typeof map !== "undefined") {
     map.invalidateSize();

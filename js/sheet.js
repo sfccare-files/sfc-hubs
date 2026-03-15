@@ -44,12 +44,17 @@ function loadHubData() {
 
         var marker = L.marker([lat, lng]);
 
-        var popup = buildPopup(hub, lat, lng);
+        marker.on("click", function() {
+          const matchedHub = allHubs.find(function(item) {
+            return item.marker === marker;
+          });
 
-        marker.bindPopup(popup, {
-          maxWidth: 360,
-          minWidth: 360,
-          className: "custom-popup"
+          if (matchedHub) {
+            setActiveSelection("hub", matchedHub.name);
+            renderTrees();
+            showHubDetailsPanel(matchedHub);
+            pulseMarker(marker);
+          }
         });
 
         marker.hubName = (hub.name || "").toLowerCase();
