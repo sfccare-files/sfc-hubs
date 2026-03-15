@@ -6,6 +6,10 @@ function buildPopup(hub, lat, lng) {
     hub.hub_assistant_phone ||
     "";
 
+  function copyIcon(label) {
+    return `<img src="assets/images/copy.png" alt="Copy ${label}" class="inline-copy-icon">`;
+  }
+
   function phoneBox(label, value) {
     return `
       <div class="box box-copy">
@@ -13,8 +17,10 @@ function buildPopup(hub, lat, lng) {
         <button
           class="inline-copy-btn"
           onclick='copyTextValue(${JSON.stringify(value || "")}, ${JSON.stringify(label)})'
+          aria-label="Copy ${label}"
+          title="Copy ${label}"
           ${value ? "" : "disabled"}>
-          Copy
+          ${copyIcon(label)}
         </button>
       </div>
     `;
@@ -45,8 +51,10 @@ function buildPopup(hub, lat, lng) {
           <div class="box-copy-text"><b>Coordinates:</b> ${lat}, ${lng}</div>
           <button
             class="inline-copy-btn"
-            onclick="copyCoordinates(${lat}, ${lng})">
-            Copy
+            onclick="copyCoordinates(${lat}, ${lng})"
+            aria-label="Copy Coordinates"
+            title="Copy Coordinates">
+            ${copyIcon("Coordinates")}
           </button>
         </div>
 
