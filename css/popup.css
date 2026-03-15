@@ -1,7 +1,5 @@
 .hub-popup{
   width: 100%;
-  height: 100%;
-  max-height: 560px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -10,10 +8,9 @@
 }
 
 .hub-popup-body{
-  flex: 1;
-  overflow-y: auto;
   padding: 16px;
   padding-bottom: 12px;
+  overflow: visible;
 }
 
 .title{
@@ -90,29 +87,20 @@
   box-shadow: none;
 }
 
-.hub-popup-body::-webkit-scrollbar{
-  width: 8px;
-}
-
-.hub-popup-body::-webkit-scrollbar-thumb{
-  background: rgba(15, 23, 42, 0.18);
-  border-radius: 999px;
-}
-
-.hub-popup-body::-webkit-scrollbar-track{
-  background: transparent;
-}
-
+/* mobile only: scrollable sheet + fixed bottom button */
 @media (max-width: 560px){
   .grid2{
     grid-template-columns: 1fr;
   }
 
   .hub-popup{
+    height: 100%;
     max-height: calc(82vh - 12px);
   }
 
   .hub-popup-body{
+    flex: 1;
+    overflow-y: auto;
     padding: 16px 14px 10px;
   }
 
@@ -143,5 +131,18 @@
     padding: 14px 18px;
     font-size: 15px;
     border-radius: 12px;
+  }
+
+  .hub-popup-body::-webkit-scrollbar{
+    width: 8px;
+  }
+
+  .hub-popup-body::-webkit-scrollbar-thumb{
+    background: rgba(15, 23, 42, 0.18);
+    border-radius: 999px;
+  }
+
+  .hub-popup-body::-webkit-scrollbar-track{
+    background: transparent;
   }
 }
