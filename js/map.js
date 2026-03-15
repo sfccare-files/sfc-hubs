@@ -79,14 +79,32 @@ function pulseMarker(marker) {
 function showHubDetailsPanel(hub) {
   const panel = document.getElementById("hubDetailsPanel");
   const content = document.getElementById("hubDetailsContent");
+  const overlay = document.getElementById("mapOverlay");
+
   if (!panel || !content || !hub) return;
 
-  content.innerHTML = buildPopup(hub.raw || hub, hub.marker.getLatLng().lat, hub.marker.getLatLng().lng);
+  content.innerHTML = buildPopup(
+    hub.raw || hub,
+    hub.marker.getLatLng().lat,
+    hub.marker.getLatLng().lng
+  );
+
   panel.classList.remove("hidden");
+
+  if (overlay) {
+    overlay.classList.remove("hidden");
+  }
 }
 
 function hideHubDetailsPanel() {
   const panel = document.getElementById("hubDetailsPanel");
-  if (!panel) return;
-  panel.classList.add("hidden");
+  const overlay = document.getElementById("mapOverlay");
+
+  if (panel) {
+    panel.classList.add("hidden");
+  }
+
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
 }

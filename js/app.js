@@ -35,6 +35,11 @@ if (hubDetailsClose) {
   });
 }
 
+const overlay = document.getElementById("mapOverlay");
+if (overlay) {
+  overlay.addEventListener("click", hideHubDetailsPanel);
+}
+
 window.addEventListener("resize", function() {
   if (typeof map !== "undefined") {
     map.invalidateSize();
