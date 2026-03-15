@@ -19,10 +19,10 @@
 
 .box{
   background: #e8edef;
-  padding: 10px;
-  border-radius: 12px;
-  margin-bottom: 8px;
-  font-size: 14px;
+  padding: 8px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  font-size: 13px;
   width: 100%;
   box-sizing: border-box;
   word-break: break-word;
@@ -33,7 +33,7 @@
 .grid2{
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
 }
 
@@ -44,12 +44,11 @@
 .section{
   background: #d6dee2;
   text-align: center;
-  padding: 8px;
-  border-radius: 12px;
-  margin-bottom: 10px;
+  padding: 7px;
+  border-radius: 10px;
+  margin-bottom: 8px;
   font-weight: 700;
   color: #1f2937;
-  font-size: 15px;
 }
 
 .hub-popup-action{
@@ -98,6 +97,7 @@
   background: transparent;
 }
 
+/* mobile only: bigger sheet content */
 @media (max-width: 560px){
   .grid2{
     grid-template-columns: 1fr;
@@ -105,11 +105,11 @@
 
   .hub-popup{
     padding: 16px 14px 88px;
-    max-height: calc(82vh - 16px);
+    max-height: calc(82vh - 12px);
   }
 
   .title{
-    font-size: 22px;
+    font-size: 20px;
     margin-bottom: 14px;
   }
 
@@ -133,7 +133,6 @@
   }
 
   .direction-btn{
-    width: 100%;
     padding: 14px 18px;
     font-size: 15px;
     border-radius: 12px;

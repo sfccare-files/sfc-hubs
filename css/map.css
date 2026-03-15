@@ -41,15 +41,15 @@
   pointer-events: none;
 }
 
-/* desktop centered hub panel */
+/* desktop centered hub panel - KEEP ORIGINAL */
 .hub-details-panel{
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(1);
-  width: 400px;
-  max-width: calc(100% - 32px);
-  max-height: calc(100% - 32px);
+  width: 380px;
+  max-width: calc(100% - 36px);
+  max-height: calc(100% - 36px);
   overflow: hidden;
   background: rgba(255,255,255,0.98);
   border: 1px solid rgba(15, 23, 42, 0.10);
@@ -85,7 +85,7 @@
   background: #e3e8eb;
 }
 
-/* mobile bottom sheet + full-screen overlay */
+/* mobile only */
 @media (max-width: 768px){
 
   .map-overlay{
