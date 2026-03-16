@@ -17,6 +17,15 @@ function updateDateTime() {
   timeEl.textContent = now.toLocaleString("en-US", options);
 }
 
+function clearStartupURLState() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("hub");
+  url.searchParams.delete("lat");
+  url.searchParams.delete("lng");
+  url.searchParams.delete("search");
+  window.history.replaceState({}, "", url.pathname);
+}
+
 function applySearchValue(value) {
   const searchBox = document.getElementById("searchBox");
   if (!searchBox) return;
@@ -37,37 +46,6 @@ function applySearchValue(value) {
   }
 }
 
-function handleURLNavigation() {
-  if (typeof allHubs === "undefined" || !Array.isArray(allHubs) || allHubs.length === 0) return;
-
-  const params = new URLSearchParams(window.location.search);
-
-  if (params.has("search")) {
-    applySearchValue(params.get("search"));
-  }
-
-  if (params.has("hub")) {
-    const hubName = params.get("hub");
-    const targetHub = allHubs.find(function(hub) {
-      return (hub.name || "").toLowerCase() === (hubName || "").toLowerCase();
-    });
-
-    if (targetHub) {
-      focusHubOnMap(targetHub, 13);
-      return;
-    }
-  }
-
-  if (params.has("lat") && params.has("lng") && typeof map !== "undefined") {
-    const lat = parseFloat(params.get("lat"));
-    const lng = parseFloat(params.get("lng"));
-
-    if (!isNaN(lat) && !isNaN(lng)) {
-      map.setView([lat, lng], 13);
-    }
-  }
-}
-
 function initFreshHomeWhenReady() {
   let tries = 0;
   const maxTries = 80;
@@ -81,6 +59,8 @@ function initFreshHomeWhenReady() {
     if (hubsReady) {
       clearInterval(timer);
 
+      clearStartupURLState();
+
       if (typeof renderTrees === "function") {
         renderTrees();
       }
@@ -88,10 +68,6 @@ function initFreshHomeWhenReady() {
       updateVisibleMarkers(allHubs);
       resetMapView();
       resetAllSections();
-
-      if (window.location.search) {
-        handleURLNavigation();
-      }
 
       if (typeof updateQuickAccessPreview === "function") {
         updateQuickAccessPreview();
