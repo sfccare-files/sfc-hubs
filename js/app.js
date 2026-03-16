@@ -237,6 +237,15 @@ if (myLocationBtn) {
   });
 }
 
+const nearestHubBtn = document.getElementById("nearestHubBtn");
+if (nearestHubBtn) {
+  nearestHubBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    goToNearestHub();
+  });
+}
+
 document.addEventListener("click", function(e) {
   const closeBtn = e.target.closest("#hubDetailsClose");
   if (closeBtn) {

@@ -38,6 +38,14 @@ function renderHubTree(hubs) {
     }
 
     link.addEventListener("click", function() {
+      if (activeSelection.type === "hub" && activeSelection.value === hub.name) {
+        activeSelection.type = "";
+        activeSelection.value = "";
+        hideHubDetailsPanel();
+        renderTrees();
+        return;
+      }
+
       focusHubOnMap(hub, 12);
     });
 

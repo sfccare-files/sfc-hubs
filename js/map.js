@@ -20,6 +20,7 @@ var hubMarkers = [];
 var allHubs = [];
 var activePulseMarker = null;
 var userLocationMarker = null;
+var lastKnownUserLocation = null;
 var toastTimer = null;
 
 map.addLayer(markers);
@@ -189,6 +190,8 @@ function goToMyLocation() {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
 
+      lastKnownUserLocation = { lat: lat, lng: lng };
+
       if (userLocationMarker) {
         map.removeLayer(userLocationMarker);
       }
@@ -201,17 +204,64 @@ function goToMyLocation() {
         fillOpacity: 0.9
       }).addTo(map);
 
-      const nearestHub = findNearestHub(lat, lng);
+      map.flyTo([lat, lng], 13, {
+        duration: 0.8
+      });
 
-      if (nearestHub) {
-        focusHubOnMap(nearestHub, 13);
-        showMapToast("Nearest hub: " + nearestHub.name);
-      } else {
-        map.flyTo([lat, lng], 13, {
-          duration: 0.8
-        });
-        showMapToast("Your location found.");
+      showMapToast("Your location found.");
+    },
+    function() {
+      showMapToast("Unable to get your location.");
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000
+    }
+  );
+}
+
+function goToNearestHub() {
+  function openNearestFromLocation(lat, lng) {
+    const nearestHub = findNearestHub(lat, lng);
+
+    if (nearestHub) {
+      focusHubOnMap(nearestHub, 13);
+      showMapToast("Nearest hub: " + nearestHub.name);
+    } else {
+      showMapToast("No hub found.");
+    }
+  }
+
+  if (lastKnownUserLocation) {
+    openNearestFromLocation(lastKnownUserLocation.lat, lastKnownUserLocation.lng);
+    return;
+  }
+
+  if (!navigator.geolocation) {
+    showMapToast("Location is not supported on this device.");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      lastKnownUserLocation = { lat: lat, lng: lng };
+
+      if (userLocationMarker) {
+        map.removeLayer(userLocationMarker);
       }
+
+      userLocationMarker = L.circleMarker([lat, lng], {
+        radius: 8,
+        weight: 3,
+        color: "#169f64",
+        fillColor: "#22c27a",
+        fillOpacity: 0.9
+      }).addTo(map);
+
+      openNearestFromLocation(lat, lng);
     },
     function() {
       showMapToast("Unable to get your location.");
