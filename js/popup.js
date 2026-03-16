@@ -6,6 +6,8 @@ function buildPopup(hub, lat, lng) {
     hub.hub_assistant_phone ||
     "";
 
+  const favoriteLabel = isFavoriteHub(hub.name) ? "★ Unfavorite" : "☆ Favorite";
+
   function copyIcon(label) {
     return `<img src="assets/images/copy.png" alt="Copy ${label}" class="inline-copy-icon">`;
   }
@@ -102,11 +104,28 @@ function buildPopup(hub, lat, lng) {
             onclick="copyCoordinates(${lat}, ${lng}, this)">
             🧭 Copy Coords
           </button>
+
+          <button
+            class="secondary-action-btn"
+            onclick='toggleFavoriteFromPopup(${JSON.stringify(hub.name)})'>
+            ${favoriteLabel}
+          </button>
         </div>
       </div>
 
     </div>
   `;
+}
+
+function toggleFavoriteFromPopup(hubName) {
+  const hub = allHubs.find(function(item) {
+    return item.name === hubName;
+  });
+
+  if (!hub) return;
+
+  toggleFavoriteHub(hub);
+  showHubDetailsPanel(hub);
 }
 
 function openDirections(lat, lng) {

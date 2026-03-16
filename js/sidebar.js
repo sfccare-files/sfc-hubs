@@ -1,3 +1,6 @@
+let recentHubs = JSON.parse(localStorage.getItem("sfc_recent_hubs") || "[]");
+let favoriteHubs = JSON.parse(localStorage.getItem("sfc_favorite_hubs") || "[]");
+
 function renderTrees() {
   const data = getCrossFilteredValues();
 
@@ -5,6 +8,7 @@ function renderTrees() {
   renderClickableTree("districtTree", data.districts, setDistrictFilter, "district");
   renderClickableTree("zoneTree", data.zones, setZoneFilter, "zone");
   renderHubTree(data.hubs);
+
   updateSidebarCounts(data);
   updateQuickAccessPreview();
 }
@@ -34,17 +38,7 @@ function renderHubTree(hubs) {
     }
 
     link.addEventListener("click", function() {
-      if (activeSelection.type === "hub" && activeSelection.value === hub.name) {
-        activeSelection.type = "";
-        activeSelection.value = "";
-        renderTrees();
-        return;
-      }
-
-      setActiveSelection("hub", hub.name);
-      renderTrees();
       focusHubOnMap(hub, 12);
-      scrollToHubTreeItem(hub.name);
     });
 
     item.appendChild(link);
@@ -84,103 +78,210 @@ function renderClickableTree(containerId, items, clickHandler, type) {
   });
 }
 
-function updateSidebarCounts(data) {
-  const divisionTreeCount = document.getElementById("divisionTreeCount");
-  const districtTreeCount = document.getElementById("districtTreeCount");
-  const zoneTreeCount = document.getElementById("zoneTreeCount");
-  const hubTreeCount = document.getElementById("hubTreeCount");
+function addRecentHub(hub) {
+  recentHubs = recentHubs.filter(h => h.name !== hub.name);
 
-  const divisionRailCount = document.getElementById("divisionRailCount");
-  const districtRailCount = document.getElementById("districtRailCount");
-  const zoneRailCount = document.getElementById("zoneRailCount");
-  const hubRailCount = document.getElementById("hubRailCount");
+  recentHubs.unshift({
+    name: hub.name,
+    district: hub.district,
+    zone: hub.zone
+  });
 
-  const divisionCount = data.divisions.length;
-  const districtCount = data.districts.length;
-  const zoneCount = data.zones.length;
-  const hubCount = data.hubs.length;
+  if (recentHubs.length > 5) {
+    recentHubs.pop();
+  }
 
-  if (divisionTreeCount) divisionTreeCount.textContent = divisionCount;
-  if (districtTreeCount) districtTreeCount.textContent = districtCount;
-  if (zoneTreeCount) zoneTreeCount.textContent = zoneCount;
-  if (hubTreeCount) hubTreeCount.textContent = hubCount;
+  localStorage.setItem("sfc_recent_hubs", JSON.stringify(recentHubs));
+}
 
-  if (divisionRailCount) divisionRailCount.textContent = divisionCount;
-  if (districtRailCount) districtRailCount.textContent = districtCount;
-  if (zoneRailCount) zoneRailCount.textContent = zoneCount;
-  if (hubRailCount) hubRailCount.textContent = hubCount;
+function isFavoriteHub(hubName) {
+  return favoriteHubs.some(function(h) {
+    return h.name === hubName;
+  });
+}
+
+function toggleFavoriteHub(hub) {
+  const index = favoriteHubs.findIndex(h => h.name === hub.name);
+
+  if (index > -1) {
+    favoriteHubs.splice(index, 1);
+  } else {
+    favoriteHubs.unshift({
+      name: hub.name,
+      district: hub.district,
+      zone: hub.zone
+    });
+  }
+
+  localStorage.setItem("sfc_favorite_hubs", JSON.stringify(favoriteHubs));
+
+  updateQuickAccessPreview();
+
+  if (activeSelection.type === "hub" && activeSelection.value === hub.name) {
+    showHubDetailsPanel(hub);
+  }
+}
+
+function renderFavoritesList() {
+  const favoriteList = document.getElementById("favoriteHubList");
+  if (!favoriteList) return;
+
+  favoriteList.innerHTML = "";
+
+  if (favoriteHubs.length === 0) {
+    favoriteList.innerHTML = `<div class="quick-empty">No favorite hubs yet</div>`;
+    return;
+  }
+
+  favoriteHubs.forEach(hub => {
+    const item = document.createElement("div");
+    item.className = "quick-list-item";
+    item.innerHTML = `
+      <div class="quick-list-item-name">${hub.name}</div>
+      <div class="quick-list-item-meta">${hub.district || ""}</div>
+    `;
+
+    item.addEventListener("click", () => {
+      const target = allHubs.find(h => h.name === hub.name);
+      if (!target) return;
+      focusHubOnMap(target, 12);
+    });
+
+    favoriteList.appendChild(item);
+  });
+}
+
+function renderRecentHubList() {
+  const recentList = document.getElementById("recentHubList");
+  if (!recentList) return;
+
+  recentList.innerHTML = "";
+
+  if (recentHubs.length === 0) {
+    recentList.innerHTML = `<div class="quick-empty">No recent hubs yet</div>`;
+    return;
+  }
+
+  recentHubs.forEach(hub => {
+    const item = document.createElement("div");
+    item.className = "quick-list-item";
+    item.innerHTML = `
+      <div class="quick-list-item-name">${hub.name}</div>
+      <div class="quick-list-item-meta">${hub.district || ""}</div>
+    `;
+
+    item.addEventListener("click", () => {
+      const target = allHubs.find(h => h.name === hub.name);
+      if (!target) return;
+      focusHubOnMap(target, 12);
+    });
+
+    recentList.appendChild(item);
+  });
 }
 
 function updateQuickAccessPreview() {
   const selectedHubLabel = document.getElementById("selectedHubLabel");
   const favoriteHubCount = document.getElementById("favoriteHubCount");
   const recentHubCount = document.getElementById("recentHubCount");
-  const favoriteHubList = document.getElementById("favoriteHubList");
-  const recentHubList = document.getElementById("recentHubList");
 
   if (selectedHubLabel) {
     selectedHubLabel.textContent =
-      activeSelection.type === "hub" && activeSelection.value
+      activeSelection.type === "hub"
         ? activeSelection.value
         : "None selected";
   }
 
   if (favoriteHubCount) {
-    favoriteHubCount.textContent = "0 hubs";
+    favoriteHubCount.textContent = favoriteHubs.length + " hubs";
   }
 
   if (recentHubCount) {
-    recentHubCount.textContent = "0 hubs";
+    recentHubCount.textContent = recentHubs.length + " hubs";
   }
 
-  if (favoriteHubList) {
-    favoriteHubList.innerHTML = `<div class="quick-empty">No favorite hubs yet</div>`;
-  }
+  renderFavoritesList();
+  renderRecentHubList();
+}
 
-  if (recentHubList) {
-    recentHubList.innerHTML = `<div class="quick-empty">No recent hubs yet</div>`;
-  }
+function updateSidebarCounts(data) {
+  setCount("divisionTreeCount", data.divisions.length);
+  setCount("districtTreeCount", data.districts.length);
+  setCount("zoneTreeCount", data.zones.length);
+  setCount("hubTreeCount", data.hubs.length);
+
+  setCount("divisionRailCount", data.divisions.length);
+  setCount("districtRailCount", data.districts.length);
+  setCount("zoneRailCount", data.zones.length);
+  setCount("hubRailCount", data.hubs.length);
+}
+
+function setCount(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
 }
 
 function initTreeToggles() {
-  const toggles = document.querySelectorAll(".tree-toggle");
-
-  toggles.forEach(toggle => {
+  document.querySelectorAll(".tree-toggle").forEach(toggle => {
     toggle.addEventListener("click", function() {
-      const targetId = this.getAttribute("data-target");
+      const id = this.dataset.target;
+      const el = document.getElementById(id);
+
+      if (!el) return;
+
+      el.classList.toggle("hidden");
+      this.classList.toggle("active");
+    });
+  });
+}
+
+function initSidebarPanel() {
+  document.querySelectorAll(".sidebar-panel-toggle").forEach(toggle => {
+    toggle.addEventListener("click", function() {
+      const targetId = this.getAttribute("data-panel-target");
       const target = document.getElementById(targetId);
+      const icon = this.querySelector(".sidebar-panel-toggle-icon");
+
       if (!target) return;
 
-      const isHidden = target.classList.contains("hidden");
+      target.classList.toggle("hidden");
 
-      if (isHidden) {
-        openSection(targetId);
-      } else {
-        closeSection(targetId);
+      if (icon) {
+        icon.textContent = target.classList.contains("hidden") ? "+" : "−";
       }
     });
   });
 }
 
+function initSidebarPanels() {
+  initSidebarPanel();
+}
+
 function initSidebarCollapse() {
   const sidebar = document.getElementById("sidebar");
-  const toggleBtn = document.getElementById("sidebarToggleBtn");
-  if (!sidebar || !toggleBtn) return;
+  const btn = document.getElementById("sidebarToggleBtn");
 
-  const savedState = localStorage.getItem("sfc_sidebar_collapsed");
-  if (savedState === "true") {
+  if (!sidebar || !btn) return;
+
+  const saved = localStorage.getItem("sfc_sidebar_collapsed");
+
+  if (saved === "true") {
     sidebar.classList.add("collapsed");
   }
 
-  toggleBtn.addEventListener("click", function() {
+  btn.addEventListener("click", function() {
     sidebar.classList.toggle("collapsed");
-    localStorage.setItem("sfc_sidebar_collapsed", sidebar.classList.contains("collapsed"));
+
+    localStorage.setItem(
+      "sfc_sidebar_collapsed",
+      sidebar.classList.contains("collapsed")
+    );
 
     setTimeout(function() {
       if (typeof map !== "undefined") {
         map.invalidateSize();
       }
-    }, 260);
+    }, 250);
   });
 }
 
@@ -196,7 +297,9 @@ function initSidebarRail() {
       const target = this.getAttribute("data-rail-target");
 
       if (action === "clear") {
-        clearAllFilters();
+        if (typeof clearAllFilters === "function") {
+          clearAllFilters();
+        }
         return;
       }
 
@@ -226,26 +329,6 @@ function initSidebarRail() {
   });
 }
 
-function initSidebarPanels() {
-  const toggles = document.querySelectorAll(".sidebar-panel-toggle");
-
-  toggles.forEach(toggle => {
-    toggle.addEventListener("click", function() {
-      const targetId = this.getAttribute("data-panel-target");
-      const target = document.getElementById(targetId);
-      const icon = this.querySelector(".sidebar-panel-toggle-icon");
-
-      if (!target) return;
-
-      target.classList.toggle("hidden");
-
-      if (icon) {
-        icon.textContent = target.classList.contains("hidden") ? "+" : "−";
-      }
-    });
-  });
-}
-
 function openSection(targetId) {
   const target = document.getElementById(targetId);
   if (!target) return;
@@ -270,23 +353,15 @@ function closeSection(targetId) {
   }
 }
 
-function resetAllSections() {
-  closeSection("divisionTree");
-  closeSection("districtTree");
-  closeSection("zoneTree");
-  closeSection("hubTree");
-}
-
-function scrollToHubTreeItem(hubName) {
+function scrollToHubTreeItem(name) {
   const hubTree = document.getElementById("hubTree");
   if (!hubTree) return;
 
-  openSection("hubTree");
+  setTimeout(() => {
+    const el = hubTree.querySelector(`[data-hub-name="${CSS.escape(name)}"]`);
 
-  setTimeout(function() {
-    const targetItem = hubTree.querySelector(`[data-hub-name="${CSS.escape(hubName)}"]`);
-    if (targetItem) {
-      targetItem.scrollIntoView({
+    if (el) {
+      el.scrollIntoView({
         behavior: "smooth",
         block: "nearest"
       });

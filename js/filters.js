@@ -57,6 +57,8 @@ function applyFilters() {
   updateVisibleMarkers(filtered);
   renderTrees();
   fitMapToFilteredHubs(filtered);
+
+  saveFilterState();
 }
 
 function setDivisionFilter(value) {
@@ -64,10 +66,12 @@ function setDivisionFilter(value) {
     activeFilters.division = "";
     activeFilters.district = "";
     activeFilters.zone = "";
+
     clearActiveSelection("division");
     clearActiveSelection("district");
     clearActiveSelection("zone");
     clearActiveSelection("hub");
+
     applyFilters();
     return;
   }
@@ -81,9 +85,11 @@ function setDistrictFilter(value) {
   if (activeFilters.district === value) {
     activeFilters.district = "";
     activeFilters.zone = "";
+
     clearActiveSelection("district");
     clearActiveSelection("zone");
     clearActiveSelection("hub");
+
     applyFilters();
     return;
   }
@@ -96,8 +102,10 @@ function setDistrictFilter(value) {
 function setZoneFilter(value) {
   if (activeFilters.zone === value) {
     activeFilters.zone = "";
+
     clearActiveSelection("zone");
     clearActiveSelection("hub");
+
     applyFilters();
     return;
   }
@@ -125,6 +133,8 @@ function clearAllFilters() {
   renderTrees();
   fitMapToFilteredHubs(allHubs);
   resetAllSections();
+
+  localStorage.removeItem("sfc_filter_state");
 }
 
 function initClearFilters() {
@@ -134,4 +144,35 @@ function initClearFilters() {
   clearBtn.addEventListener("click", function() {
     clearAllFilters();
   });
+}
+
+function saveFilterState() {
+  const searchBox = document.getElementById("searchBox");
+
+  const state = {
+    division: activeFilters.division,
+    district: activeFilters.district,
+    zone: activeFilters.zone,
+    search: searchBox ? searchBox.value : ""
+  };
+
+  localStorage.setItem("sfc_filter_state", JSON.stringify(state));
+}
+
+function restoreFilterState() {
+  const saved = localStorage.getItem("sfc_filter_state");
+  if (!saved) return;
+
+  try {
+    const state = JSON.parse(saved);
+
+    activeFilters.division = state.division || "";
+    activeFilters.district = state.district || "";
+    activeFilters.zone = state.zone || "";
+
+    const searchBox = document.getElementById("searchBox");
+    if (searchBox && state.search) {
+      searchBox.value = state.search;
+    }
+  } catch (e) {}
 }

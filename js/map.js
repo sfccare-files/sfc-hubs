@@ -54,6 +54,20 @@ function fitMapToFilteredHubs(filteredHubs) {
 function focusHubOnMap(hub, zoomLevel) {
   if (!hub || !hub.marker) return;
 
+  if (typeof setActiveSelection === "function") {
+    setActiveSelection("hub", hub.name);
+  } else {
+    activeSelection.type = "hub";
+    activeSelection.value = hub.name;
+  }
+
+  addRecentHub(hub);
+  localStorage.setItem("sfc_last_hub", hub.name);
+
+  if (typeof renderTrees === "function") {
+    renderTrees();
+  }
+
   map.flyTo(hub.marker.getLatLng(), zoomLevel || 12, {
     duration: 0.8
   });
@@ -61,6 +75,8 @@ function focusHubOnMap(hub, zoomLevel) {
   setTimeout(function() {
     showHubDetailsPanel(hub);
     pulseMarker(hub.marker);
+    scrollToHubTreeItem(hub.name);
+    updateHubURL(hub);
   }, 350);
 }
 
@@ -119,6 +135,45 @@ function resetMapView() {
   map.flyTo(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, {
     duration: 0.8
   });
+
+  const url = new URL(window.location.href);
+  url.searchParams.delete("hub");
+  window.history.replaceState({}, "", url.toString());
+}
+
+function getDistanceKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function findNearestHub(lat, lng) {
+  if (!Array.isArray(allHubs) || allHubs.length === 0) return null;
+
+  let nearestHub = null;
+  let nearestDistance = Infinity;
+
+  allHubs.forEach(function(hub) {
+    const hubLat = hub.marker.getLatLng().lat;
+    const hubLng = hub.marker.getLatLng().lng;
+    const distance = getDistanceKm(lat, lng, hubLat, hubLng);
+
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestHub = hub;
+    }
+  });
+
+  return nearestHub;
 }
 
 function goToMyLocation() {
@@ -144,11 +199,17 @@ function goToMyLocation() {
         fillOpacity: 0.9
       }).addTo(map);
 
-      map.flyTo([lat, lng], 13, {
-        duration: 0.8
-      });
+      const nearestHub = findNearestHub(lat, lng);
 
-      showMapToast("Your location found.");
+      if (nearestHub) {
+        focusHubOnMap(nearestHub, 13);
+        showMapToast("Nearest hub: " + nearestHub.name);
+      } else {
+        map.flyTo([lat, lng], 13, {
+          duration: 0.8
+        });
+        showMapToast("Your location found.");
+      }
     },
     function() {
       showMapToast("Unable to get your location.");
@@ -213,4 +274,12 @@ function showMapToast(message) {
   toastTimer = setTimeout(function() {
     toast.classList.add("hidden");
   }, 2200);
+}
+
+function updateHubURL(hub) {
+  if (!hub || !hub.name) return;
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("hub", hub.name);
+  window.history.replaceState({}, "", url.toString());
 }

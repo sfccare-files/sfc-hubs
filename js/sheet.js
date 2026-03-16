@@ -4,7 +4,6 @@ const sheetURL =
 function hideLoadingScreen() {
   const loadingScreen = document.getElementById("loadingScreen");
   if (!loadingScreen) return;
-
   loadingScreen.style.display = "none";
 }
 
@@ -42,19 +41,16 @@ function loadHubData() {
 
         if (isNaN(lat) || isNaN(lng)) return;
 
-        var marker = L.marker([lat, lng]);
+        const marker = L.marker([lat, lng]);
 
         marker.on("click", function() {
           const matchedHub = allHubs.find(function(item) {
             return item.marker === marker;
           });
 
-          if (matchedHub) {
-            setActiveSelection("hub", matchedHub.name);
-            renderTrees();
-            showHubDetailsPanel(matchedHub);
-            pulseMarker(marker);
-          }
+          if (!matchedHub) return;
+
+          focusHubOnMap(matchedHub, 12);
         });
 
         marker.on("mouseover", function(e) {
@@ -92,6 +88,8 @@ function loadHubData() {
           zone: hub.zone || "",
           district: hub.district || "",
           division: hub.division || "",
+          lat: lat,
+          lng: lng,
           marker: marker,
           raw: hub
         });
