@@ -1,7 +1,7 @@
 var activeFilters = {
-  division: "",
-  district: "",
-  zone: ""
+  division: [],
+  district: [],
+  zone: []
 };
 
 var activeSelection = {
@@ -31,10 +31,29 @@ function getFilteredHubs() {
   const searchValue = getSearchValue();
 
   return allHubs.filter(hub => {
-    const matchDivision = !activeFilters.division || hub.division === activeFilters.division;
-    const matchDistrict = !activeFilters.district || hub.district === activeFilters.district;
-    const matchZone = !activeFilters.zone || hub.zone === activeFilters.zone;
-    const matchSearch = !searchValue || hub.name.toLowerCase().includes(searchValue);
+    const hubName = (hub.name || "").toLowerCase();
+    const hubDivision = (hub.division || "").toLowerCase();
+    const hubDistrict = (hub.district || "").toLowerCase();
+    const hubZone = (hub.zone || "").toLowerCase();
+
+    const matchDivision =
+      activeFilters.division.length === 0 ||
+      activeFilters.division.includes(hub.division);
+
+    const matchDistrict =
+      activeFilters.district.length === 0 ||
+      activeFilters.district.includes(hub.district);
+
+    const matchZone =
+      activeFilters.zone.length === 0 ||
+      activeFilters.zone.includes(hub.zone);
+
+    const matchSearch =
+      !searchValue ||
+      hubName.includes(searchValue) ||
+      hubDivision.includes(searchValue) ||
+      hubDistrict.includes(searchValue) ||
+      hubZone.includes(searchValue);
 
     return matchDivision && matchDistrict && matchZone && matchSearch;
   });
@@ -47,7 +66,9 @@ function getCrossFilteredValues() {
     divisions: [...new Set(filtered.map(h => h.division).filter(Boolean))].sort(),
     districts: [...new Set(filtered.map(h => h.district).filter(Boolean))].sort(),
     zones: [...new Set(filtered.map(h => h.zone).filter(Boolean))].sort(),
-    hubs: filtered
+    hubs: filtered.slice().sort(function(a, b) {
+      return (a.name || "").localeCompare(b.name || "");
+    })
   };
 }
 
@@ -60,64 +81,39 @@ function applyFilters() {
   saveFilterState();
 }
 
-function setDivisionFilter(value) {
-  if (activeFilters.division === value) {
-    activeFilters.division = "";
-    activeFilters.district = "";
-    activeFilters.zone = "";
+function toggleArrayFilter(filterKey, value) {
+  const list = activeFilters[filterKey];
+  const index = list.indexOf(value);
 
-    clearActiveSelection("division");
-    clearActiveSelection("district");
-    clearActiveSelection("zone");
-    clearActiveSelection("hub");
-
-    applyFilters();
-    return;
+  if (index >= 0) {
+    list.splice(index, 1);
+  } else {
+    list.push(value);
   }
+}
 
-  activeFilters.division = value;
-  setActiveSelection("division", value);
+function setDivisionFilter(value) {
+  toggleArrayFilter("division", value);
+  clearActiveSelection("hub");
   applyFilters();
 }
 
 function setDistrictFilter(value) {
-  if (activeFilters.district === value) {
-    activeFilters.district = "";
-    activeFilters.zone = "";
-
-    clearActiveSelection("district");
-    clearActiveSelection("zone");
-    clearActiveSelection("hub");
-
-    applyFilters();
-    return;
-  }
-
-  activeFilters.district = value;
-  setActiveSelection("district", value);
+  toggleArrayFilter("district", value);
+  clearActiveSelection("hub");
   applyFilters();
 }
 
 function setZoneFilter(value) {
-  if (activeFilters.zone === value) {
-    activeFilters.zone = "";
-
-    clearActiveSelection("zone");
-    clearActiveSelection("hub");
-
-    applyFilters();
-    return;
-  }
-
-  activeFilters.zone = value;
-  setActiveSelection("zone", value);
+  toggleArrayFilter("zone", value);
+  clearActiveSelection("hub");
   applyFilters();
 }
 
 function clearAllFilters() {
-  activeFilters.division = "";
-  activeFilters.district = "";
-  activeFilters.zone = "";
+  activeFilters.division = [];
+  activeFilters.district = [];
+  activeFilters.zone = [];
 
   activeSelection.type = "";
   activeSelection.value = "";
@@ -165,9 +161,9 @@ function restoreFilterState() {
   try {
     const state = JSON.parse(saved);
 
-    activeFilters.division = state.division || "";
-    activeFilters.district = state.district || "";
-    activeFilters.zone = state.zone || "";
+    activeFilters.division = Array.isArray(state.division) ? state.division : [];
+    activeFilters.district = Array.isArray(state.district) ? state.district : [];
+    activeFilters.zone = Array.isArray(state.zone) ? state.zone : [];
 
     const searchBox = document.getElementById("searchBox");
     if (searchBox && state.search) {

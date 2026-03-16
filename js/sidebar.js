@@ -20,7 +20,11 @@ function renderHubTree(hubs) {
   hubTree.innerHTML = "";
 
   if (hubs.length === 0) {
-    hubTree.innerHTML = `<div class="tree-item empty-tree">No hubs found</div>`;
+    hubTree.innerHTML = `
+      <div class="tree-item empty-tree">
+        No hubs found.<br>Try clearing filters or searching differently.
+      </div>
+    `;
     return;
   }
 
@@ -73,7 +77,15 @@ function renderClickableTree(containerId, items, clickHandler, type) {
     link.className = "tree-link";
     link.textContent = item;
 
-    if (activeSelection.type === type && activeSelection.value === item) {
+    if (type === "division" && activeFilters.division.includes(item)) {
+      link.classList.add("active-item");
+    }
+
+    if (type === "district" && activeFilters.district.includes(item)) {
+      link.classList.add("active-item");
+    }
+
+    if (type === "zone" && activeFilters.zone.includes(item)) {
       link.classList.add("active-item");
     }
 
