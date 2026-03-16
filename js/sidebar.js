@@ -225,7 +225,6 @@ function initTreeToggles() {
     toggle.addEventListener("click", function() {
       const id = this.dataset.target;
       const el = document.getElementById(id);
-
       if (!el) return;
 
       el.classList.toggle("hidden");
@@ -346,6 +345,13 @@ function closeSection(targetId) {
   if (toggle) {
     toggle.classList.remove("active");
   }
+}
+
+function resetAllSections() {
+  closeSection("divisionTree");
+  closeSection("districtTree");
+  closeSection("zoneTree");
+  closeSection("hubTree");
 }
 
 function scrollToHubTreeItem(name) {

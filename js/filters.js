@@ -57,7 +57,6 @@ function applyFilters() {
   updateVisibleMarkers(filtered);
   renderTrees();
   fitMapToFilteredHubs(filtered);
-
   saveFilterState();
 }
 

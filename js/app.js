@@ -219,21 +219,21 @@ resetAllSections();
 
 restorePhase2StateWhenReady();
 
-const hubDetailsClose = document.getElementById("hubDetailsClose");
-if (hubDetailsClose) {
-  hubDetailsClose.addEventListener("click", function(e) {
+const resetMapBtn = document.getElementById("resetMapBtn");
+if (resetMapBtn) {
+  resetMapBtn.addEventListener("click", function(e) {
     e.preventDefault();
     e.stopPropagation();
-    hideHubDetailsPanel();
+    resetMapView();
   });
 }
 
-const overlay = document.getElementById("mapOverlay");
-if (overlay) {
-  overlay.addEventListener("click", function(e) {
+const myLocationBtn = document.getElementById("myLocationBtn");
+if (myLocationBtn) {
+  myLocationBtn.addEventListener("click", function(e) {
     e.preventDefault();
     e.stopPropagation();
-    hideHubDetailsPanel();
+    goToMyLocation();
   });
 }
 
@@ -253,24 +253,6 @@ document.addEventListener("click", function(e) {
     hideHubDetailsPanel();
   }
 });
-
-const resetMapBtn = document.getElementById("resetMapBtn");
-if (resetMapBtn) {
-  resetMapBtn.addEventListener("click", function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    resetMapView();
-  });
-}
-
-const myLocationBtn = document.getElementById("myLocationBtn");
-if (myLocationBtn) {
-  myLocationBtn.addEventListener("click", function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    goToMyLocation();
-  });
-}
 
 const sidebarScrollArea = document.querySelector(".sidebar-scroll-area");
 if (sidebarScrollArea) {

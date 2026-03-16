@@ -39,11 +39,9 @@ function buildPopup(hub, lat, lng) {
       </button>
 
       <div class="hub-popup-body">
-
         <h2 class="title">Hub Details</h2>
 
         <div class="box"><b>Name:</b> ${hub.name || ""}</div>
-
         <div class="box"><b>Address:</b> ${hub.address || ""}</div>
 
         <div class="grid2">
@@ -90,7 +88,6 @@ function buildPopup(hub, lat, lng) {
           <div class="box"><b>Hub Asst:</b> ${hub.hub_assistant || ""}</div>
           ${phoneBox("Phone", hub.hub_assistant_phone || "")}
         </div>
-
       </div>
 
       <div class="hub-popup-footer">

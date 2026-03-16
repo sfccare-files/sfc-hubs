@@ -1,10 +1,10 @@
 var DEFAULT_MAP_CENTER = [23.6850, 90.3563];
 var DEFAULT_MAP_ZOOM = 7;
 
-var map = L.map('map').setView(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM);
+var map = L.map("map").setView(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap'
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "© OpenStreetMap"
 }).addTo(map);
 
 var markers = L.markerClusterGroup({
@@ -138,6 +138,8 @@ function resetMapView() {
 
   const url = new URL(window.location.href);
   url.searchParams.delete("hub");
+  url.searchParams.delete("lat");
+  url.searchParams.delete("lng");
   window.history.replaceState({}, "", url.toString());
 }
 
