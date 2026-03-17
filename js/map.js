@@ -107,6 +107,19 @@ function pulseMarker(marker) {
   }, 3000);
 }
 
+function getCurrentHubDistance(lat, lng) {
+  if (!lastKnownUserLocation) return "";
+
+  const distance = getDistanceKm(
+    lastKnownUserLocation.lat,
+    lastKnownUserLocation.lng,
+    lat,
+    lng
+  );
+
+  return distance.toFixed(2) + " km";
+}
+
 function showHubDetailsPanel(hub) {
   const panel = document.getElementById("hubDetailsPanel");
   const content = document.getElementById("hubDetailsContent");
@@ -114,10 +127,15 @@ function showHubDetailsPanel(hub) {
 
   if (!panel || !content || !hub) return;
 
+  const lat = hub.marker.getLatLng().lat;
+  const lng = hub.marker.getLatLng().lng;
+  const distanceFromUser = getCurrentHubDistance(lat, lng);
+
   content.innerHTML = buildPopup(
     hub.raw || hub,
-    hub.marker.getLatLng().lat,
-    hub.marker.getLatLng().lng
+    lat,
+    lng,
+    distanceFromUser
   );
 
   panel.classList.remove("hidden");
@@ -236,6 +254,16 @@ function goToMyLocation() {
         showMapToast("Your location found. Nearest hub is " + nearestData.hub.name + " (" + nearestData.distance.toFixed(2) + " km)");
       } else {
         showMapToast("Your location found.");
+      }
+
+      if (activeSelection.type === "hub" && activeSelection.value) {
+        const activeHub = allHubs.find(function(hub) {
+          return hub.name === activeSelection.value;
+        });
+
+        if (activeHub) {
+          showHubDetailsPanel(activeHub);
+        }
       }
     },
     function() {

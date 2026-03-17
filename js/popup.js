@@ -1,4 +1,4 @@
-function buildPopup(hub, lat, lng) {
+function buildPopup(hub, lat, lng, distanceFromUser) {
   const preferredPhone =
     hub.hub_phone ||
     hub.manager_phone ||
@@ -28,6 +28,10 @@ function buildPopup(hub, lat, lng) {
     `;
   }
 
+  const distanceLine = distanceFromUser
+    ? `<div class="distance-line"><b>Distance from You:</b> ${distanceFromUser}</div>`
+    : "";
+
   return `
     <div class="hub-popup">
       <button
@@ -55,7 +59,10 @@ function buildPopup(hub, lat, lng) {
         </div>
 
         <div class="box box-copy">
-          <div class="box-copy-text"><b>Coordinates:</b> ${lat}, ${lng}</div>
+          <div class="box-copy-text">
+            <div><b>Coordinates:</b> ${lat}, ${lng}</div>
+            ${distanceLine}
+          </div>
           <button
             class="inline-copy-btn"
             onclick="copyCoordinates(${lat}, ${lng}, this)"
