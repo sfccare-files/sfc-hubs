@@ -76,6 +76,17 @@ function focusHubOnMap(hub, zoomLevel) {
     showHubDetailsPanel(hub);
     pulseMarker(hub.marker);
     scrollToHubTreeItem(hub.name);
+
+    if (lastKnownUserLocation) {
+      const distance = getDistanceKm(
+        lastKnownUserLocation.lat,
+        lastKnownUserLocation.lng,
+        hub.marker.getLatLng().lat,
+        hub.marker.getLatLng().lng
+      );
+
+      showMapToast("Distance to " + hub.name + ": " + distance.toFixed(2) + " km");
+    }
   }, 350);
 }
 
@@ -142,6 +153,14 @@ function resetMapView() {
   if (typeof renderTrees === "function") {
     renderTrees();
   }
+
+  if (typeof hideHeatmap === "function") {
+    hideHeatmap();
+  }
+
+  if (typeof setHeatmapButtonState === "function") {
+    setHeatmapButtonState(false);
+  }
 }
 
 function getDistanceKm(lat1, lng1, lat2, lng2) {
@@ -176,7 +195,10 @@ function findNearestHub(lat, lng) {
     }
   });
 
-  return nearestHub;
+  return {
+    hub: nearestHub,
+    distance: nearestDistance
+  };
 }
 
 function goToMyLocation() {
@@ -208,7 +230,13 @@ function goToMyLocation() {
         duration: 0.8
       });
 
-      showMapToast("Your location found.");
+      const nearestData = findNearestHub(lat, lng);
+
+      if (nearestData && nearestData.hub) {
+        showMapToast("Your location found. Nearest hub is " + nearestData.hub.name + " (" + nearestData.distance.toFixed(2) + " km)");
+      } else {
+        showMapToast("Your location found.");
+      }
     },
     function() {
       showMapToast("Unable to get your location.");
@@ -222,11 +250,11 @@ function goToMyLocation() {
 
 function goToNearestHub() {
   function openNearestFromLocation(lat, lng) {
-    const nearestHub = findNearestHub(lat, lng);
+    const nearestData = findNearestHub(lat, lng);
 
-    if (nearestHub) {
-      focusHubOnMap(nearestHub, 13);
-      showMapToast("Nearest hub: " + nearestHub.name);
+    if (nearestData && nearestData.hub) {
+      focusHubOnMap(nearestData.hub, 13);
+      showMapToast("Nearest hub: " + nearestData.hub.name + " (" + nearestData.distance.toFixed(2) + " km)");
     } else {
       showMapToast("No hub found.");
     }

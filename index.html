@@ -168,6 +168,7 @@
           <button id="resetMapBtn" class="map-tool-btn">Reset Map</button>
           <button id="myLocationBtn" class="map-tool-btn">My Location</button>
           <button id="nearestHubBtn" class="map-tool-btn">Nearest Hub</button>
+          <button id="heatmapToggleBtn" class="map-tool-btn">Heatmap</button>
         </div>
 
         <div id="markerHoverCard" class="marker-hover-card hidden"></div>
@@ -188,8 +189,11 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
   <script src="js/map.js"></script>
+  <script src="js/heatmap.js"></script>
+  <script src="js/mapLayers.js"></script>
   <script src="js/popup.js"></script>
   <script src="js/sidebar.js"></script>
   <script src="js/filters.js"></script>

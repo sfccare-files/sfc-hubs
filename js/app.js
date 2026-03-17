@@ -17,35 +17,6 @@ function updateDateTime() {
   timeEl.textContent = now.toLocaleString("en-US", options);
 }
 
-function clearStartupURLState() {
-  const url = new URL(window.location.href);
-  url.searchParams.delete("hub");
-  url.searchParams.delete("lat");
-  url.searchParams.delete("lng");
-  url.searchParams.delete("search");
-  window.history.replaceState({}, "", url.pathname);
-}
-
-function applySearchValue(value) {
-  const searchBox = document.getElementById("searchBox");
-  if (!searchBox) return;
-
-  searchBox.value = value || "";
-
-  if (typeof renderTrees === "function") {
-    renderTrees();
-  }
-
-  if (typeof getFilteredHubs === "function" && typeof updateVisibleMarkers === "function") {
-    const filtered = getFilteredHubs();
-    updateVisibleMarkers(filtered);
-
-    if (typeof fitMapToFilteredHubs === "function" && filtered.length > 0) {
-      fitMapToFilteredHubs(filtered);
-    }
-  }
-}
-
 function initFreshHomeWhenReady() {
   let tries = 0;
   const maxTries = 80;
@@ -59,8 +30,6 @@ function initFreshHomeWhenReady() {
     if (hubsReady) {
       clearInterval(timer);
 
-      clearStartupURLState();
-
       if (typeof renderTrees === "function") {
         renderTrees();
       }
@@ -71,6 +40,10 @@ function initFreshHomeWhenReady() {
 
       if (typeof updateQuickAccessPreview === "function") {
         updateQuickAccessPreview();
+      }
+
+      if (typeof refreshHeatmapData === "function") {
+        refreshHeatmapData();
       }
 
       return;
@@ -108,6 +81,10 @@ initSearch();
 initClearFilters();
 loadHubData();
 resetAllSections();
+
+if (typeof initMapLayerControls === "function") {
+  initMapLayerControls();
+}
 
 initFreshHomeWhenReady();
 
