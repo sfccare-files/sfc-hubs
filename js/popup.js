@@ -4,6 +4,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
     hub.manager_phone ||
     hub.assistant_manager_phone ||
     hub.hub_assistant_phone ||
+    hub.phone ||
     "";
 
   const favoriteIcon = isFavoriteHub(hub.name) ? "★" : "☆";
@@ -54,6 +55,11 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
         <div class="grid2">
           <div class="box"><b>District:</b> ${hub.district || ""}</div>
           <div class="box"><b>Division:</b> ${hub.division || ""}</div>
+        </div>
+
+        <div class="grid2">
+          <div class="box"><b>Zonal Manager:</b> ${hub.zonal || ""}</div>
+          ${phoneBox("Phone", hub.phone || "")}
         </div>
 
         <div class="box box-copy">
