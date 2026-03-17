@@ -28,9 +28,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
     `;
   }
 
-  const distanceBox = distanceFromUser
-    ? `<div class="box"><b>Distance from You:</b> ${distanceFromUser}</div>`
-    : "";
+  const distanceValue = distanceFromUser || "Not available";
 
   return `
     <div class="hub-popup">
@@ -69,7 +67,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
           </button>
         </div>
 
-        ${distanceBox}
+        <div class="box"><b>Distance from You:</b> ${distanceValue}</div>
 
         <hr>
 
