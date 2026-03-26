@@ -4,9 +4,11 @@
   <meta charset="utf-8">
   <title>SFC Hub Locator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
+
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/header.css">
   <link rel="stylesheet" href="css/sidebar.css">
@@ -14,6 +16,65 @@
   <link rel="stylesheet" href="css/popup.css">
   <link rel="stylesheet" href="css/search.css">
   <link rel="stylesheet" href="css/responsive.css">
+
+  <style>
+    .map-view-wrapper{
+      position:relative;
+    }
+
+    .map-view-dropdown{
+      position:absolute;
+      top:110%;
+      right:0;
+      min-width:145px;
+      background:#ffffff;
+      border:1px solid rgba(15,23,42,0.08);
+      border-radius:12px;
+      box-shadow:0 14px 30px rgba(15,23,42,0.14);
+      padding:8px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      z-index:1200;
+    }
+
+    .map-view-dropdown.hidden{
+      display:none;
+    }
+
+    .map-view-option{
+      border:none;
+      background:#f5f7fa;
+      color:#1f2937;
+      padding:10px 12px;
+      border-radius:10px;
+      text-align:left;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+      transition:all .18s ease;
+    }
+
+    .map-view-option:hover{
+      background:#e8eef4;
+    }
+
+    .map-view-option.active{
+      background:#169f64;
+      color:#fff;
+    }
+
+    @media (max-width:768px){
+      .map-view-dropdown{
+        min-width:135px;
+      }
+
+      .map-view-option{
+        font-size:12px;
+        padding:10px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="app-shell">
@@ -21,7 +82,9 @@
       <div class="brand-wrap">
         <img src="assets/images/steadfast-logo.png" class="brand-logo-img">
       </div>
+
       <div class="header-time" id="liveDateTime">Loading time...</div>
+
       <div class="header-search">
         <input id="searchBox" type="text" placeholder="Search Hub" autocomplete="off">
         <span class="search-icon">⌕</span>
@@ -156,6 +219,16 @@
           <button id="myLocationBtn" class="map-tool-btn">My Location</button>
           <button id="nearestHubBtn" class="map-tool-btn">Nearest Hub</button>
           <button id="heatmapToggleBtn" class="map-tool-btn">Heatmap</button>
+
+          <div class="map-view-wrapper">
+            <button id="mapViewBtn" class="map-tool-btn">Map View</button>
+
+            <div id="mapViewDropdown" class="map-view-dropdown hidden">
+              <button class="map-view-option" data-basemap="standard">Standard</button>
+              <button class="map-view-option" data-basemap="satellite">Satellite</button>
+              <button class="map-view-option" data-basemap="hybrid">Hybrid</button>
+            </div>
+          </div>
         </div>
 
         <div id="markerHoverCard" class="marker-hover-card hidden"></div>
@@ -179,6 +252,7 @@
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
   <script src="js/map.js"></script>
+  <script src="js/basemaps.js"></script>
   <script src="js/heatmap.js"></script>
   <script src="js/mapLayers.js"></script>
   <script src="js/popup.js"></script>
