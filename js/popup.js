@@ -1,9 +1,24 @@
 function buildPopup(hub, lat, lng, distanceFromUser) {
+  const policeStation =
+    hub.police_station ||
+    hub["police station"] ||
+    "";
+
+  const teamLeader =
+    hub.team_leader ||
+    hub["team leader"] ||
+    "";
+
+  const teamLeaderPhone =
+    hub.team_leader_phone ||
+    hub["team leader phone"] ||
+    "";
+
   const preferredPhone =
     hub.hub_phone ||
     hub.manager_phone ||
     hub.assistant_manager_phone ||
-    hub.team_leader_phone ||
+    teamLeaderPhone ||
     hub.phone ||
     "";
 
@@ -61,7 +76,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
           ${phoneBox("Phone", hub.phone || "")}
         </div>
 
-        <div class="box"><b>Police Station:</b> ${hub.police_station || ""}</div>
+        <div class="box"><b>Police Station:</b> ${policeStation}</div>
 
         <div class="box box-copy">
           <div class="box-copy-text"><b>Coordinates:</b> ${lat}, ${lng}</div>
@@ -94,8 +109,8 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
         </div>
 
         <div class="grid2">
-          <div class="box"><b>Team Leader:</b> ${hub.team_leader || ""}</div>
-          ${phoneBox("Phone", hub.team_leader_phone || "")}
+          <div class="box"><b>Team Leader:</b> ${teamLeader}</div>
+          ${phoneBox("Phone", teamLeaderPhone)}
         </div>
       </div>
 
