@@ -5,7 +5,6 @@
   box-sizing:border-box;
   background:transparent;
   position:relative;
-  z-index:1;
 }
 
 .hub-favorite-btn{
@@ -21,11 +20,10 @@
   font-size:18px;
   line-height:1;
   cursor:pointer;
-  z-index:5001;
+  z-index:2;
   display:flex;
   align-items:center;
   justify-content:center;
-  pointer-events:auto;
 }
 
 .hub-favorite-btn:hover{
@@ -110,8 +108,8 @@
 }
 
 .inline-copy-icon{
-  width:16px;
-  height:16px;
+  width:18px;
+  height:18px;
   object-fit:contain;
   display:block;
   pointer-events:none;
@@ -253,8 +251,8 @@
   }
 
   .inline-copy-icon{
-    width:18px;
-    height:18px;
+    width:20px;
+    height:20px;
   }
 
   .section{

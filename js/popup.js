@@ -3,11 +3,12 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
     hub.hub_phone ||
     hub.manager_phone ||
     hub.assistant_manager_phone ||
-    hub.hub_assistant_phone ||
+    hub.team_leader_phone ||
     hub.phone ||
     "";
 
   const favoriteIcon = isFavoriteHub(hub.name) ? "★" : "☆";
+  const distanceValue = distanceFromUser || "Not available";
 
   function copyIcon(label) {
     return `<img src="assets/images/copy.png" alt="Copy ${label}" class="inline-copy-icon">`;
@@ -29,8 +30,6 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
     `;
   }
 
-  const distanceValue = distanceFromUser || "Not available";
-
   return `
     <div class="hub-popup">
       <button
@@ -49,7 +48,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
 
         <div class="grid2">
           <div class="box"><b>Hub ID:</b> ${hub.hub_id || ""}</div>
-          <div class="box"><b>Zone:</b> ${hub.zone || ""}</div>
+          <div class="box"><b>Distance:</b> ${distanceValue}</div>
         </div>
 
         <div class="grid2">
@@ -62,6 +61,8 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
           ${phoneBox("Phone", hub.phone || "")}
         </div>
 
+        <div class="box"><b>Police Station:</b> ${hub.police_station || ""}</div>
+
         <div class="box box-copy">
           <div class="box-copy-text"><b>Coordinates:</b> ${lat}, ${lng}</div>
           <button
@@ -72,8 +73,6 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
             ${copyIcon("Coordinates")}
           </button>
         </div>
-
-        <div class="box"><b>Distance from You:</b> ${distanceValue}</div>
 
         <hr>
 
@@ -95,8 +94,8 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
         </div>
 
         <div class="grid2">
-          <div class="box"><b>Hub Asst:</b> ${hub.hub_assistant || ""}</div>
-          ${phoneBox("Phone", hub.hub_assistant_phone || "")}
+          <div class="box"><b>Team Leader:</b> ${hub.team_leader || ""}</div>
+          ${phoneBox("Phone", hub.team_leader_phone || "")}
         </div>
       </div>
 
