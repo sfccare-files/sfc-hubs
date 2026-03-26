@@ -41,16 +41,19 @@ function loadHubData() {
 
         if (isNaN(lat) || isNaN(lng)) return;
 
-        const marker = L.marker([lat, lng]);
+        var marker = L.marker([lat, lng]);
 
         marker.on("click", function() {
           const matchedHub = allHubs.find(function(item) {
             return item.marker === marker;
           });
 
-          if (!matchedHub) return;
-
-          focusHubOnMap(matchedHub, 12);
+          if (matchedHub) {
+            setActiveSelection("hub", matchedHub.name);
+            renderTrees();
+            showHubDetailsPanel(matchedHub);
+            pulseMarker(marker);
+          }
         });
 
         marker.on("mouseover", function(e) {
@@ -85,11 +88,9 @@ function loadHubData() {
 
         allHubs.push({
           name: hub.name || "",
-          zone: hub.zone || "",
+          police_station: hub.police_station || "",
           district: hub.district || "",
           division: hub.division || "",
-          lat: lat,
-          lng: lng,
           marker: marker,
           raw: hub
         });
@@ -97,6 +98,11 @@ function loadHubData() {
 
       renderTrees();
       updateVisibleMarkers(allHubs);
+
+      if (typeof refreshHeatmapData === "function") {
+        refreshHeatmapData();
+      }
+
       hideLoadingScreen();
     },
     error: function() {

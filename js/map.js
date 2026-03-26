@@ -359,7 +359,7 @@ function showMarkerHover(hub, originalEvent) {
   card.innerHTML = `
     <div class="marker-hover-title">${hub.name}</div>
     <div class="marker-hover-meta">${hub.district || "-"} • ${hub.division || "-"}</div>
-    <div class="marker-hover-meta">Zone: ${hub.zone || "-"}</div>
+    <div class="marker-hover-meta">Police Station: ${hub.police_station || "-"}</div>
   `;
 
   card.classList.remove("hidden");
