@@ -1,25 +1,16 @@
 function buildPopup(hub, lat, lng, distanceFromUser) {
-  const policeStation =
-    hub.police_station ||
-    hub["police station"] ||
-    "";
-
-  const teamLeader =
-    hub.team_leader ||
-    hub["team leader"] ||
-    "";
-
-  const teamLeaderPhone =
-    hub.team_leader_phone ||
-    hub["team leader phone"] ||
-    "";
+  const policeStation = hub.police_station || "";
+  const zonalManager = hub.zonal || "";
+  const zonalManagerPhone = hub.phone || "";
+  const teamLeader = hub.team_leader || "";
+  const teamLeaderPhone = hub.team_leader_phone || "";
 
   const preferredPhone =
     hub.hub_phone ||
     hub.manager_phone ||
     hub.assistant_manager_phone ||
     teamLeaderPhone ||
-    hub.phone ||
+    zonalManagerPhone ||
     "";
 
   const favoriteIcon = isFavoriteHub(hub.name) ? "★" : "☆";
@@ -72,8 +63,8 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
         </div>
 
         <div class="grid2">
-          <div class="box"><b>Zonal Manager:</b> ${hub.zonal || ""}</div>
-          ${phoneBox("Phone", hub.phone || "")}
+          <div class="box"><b>Zonal Manager:</b> ${zonalManager}</div>
+          ${phoneBox("Phone", zonalManagerPhone)}
         </div>
 
         <div class="box"><b>Police Station:</b> ${policeStation}</div>
