@@ -1,7 +1,7 @@
 var activeFilters = {
   division: [],
   district: [],
-  zone: []
+  police_station: []
 };
 
 var activeSelection = {
@@ -34,7 +34,7 @@ function getFilteredHubs() {
     const hubName = (hub.name || "").toLowerCase();
     const hubDivision = (hub.division || "").toLowerCase();
     const hubDistrict = (hub.district || "").toLowerCase();
-    const hubZone = (hub.zone || "").toLowerCase();
+    const hubPoliceStation = (hub.police_station || "").toLowerCase();
 
     const matchDivision =
       activeFilters.division.length === 0 ||
@@ -44,18 +44,18 @@ function getFilteredHubs() {
       activeFilters.district.length === 0 ||
       activeFilters.district.includes(hub.district);
 
-    const matchZone =
-      activeFilters.zone.length === 0 ||
-      activeFilters.zone.includes(hub.zone);
+    const matchPoliceStation =
+      activeFilters.police_station.length === 0 ||
+      activeFilters.police_station.includes(hub.police_station);
 
     const matchSearch =
       !searchValue ||
       hubName.includes(searchValue) ||
       hubDivision.includes(searchValue) ||
       hubDistrict.includes(searchValue) ||
-      hubZone.includes(searchValue);
+      hubPoliceStation.includes(searchValue);
 
-    return matchDivision && matchDistrict && matchZone && matchSearch;
+    return matchDivision && matchDistrict && matchPoliceStation && matchSearch;
   });
 }
 
@@ -64,12 +64,12 @@ function getCrossFilteredValues() {
 
   const divisions = [...new Set(allHubs.map(h => h.division).filter(Boolean))].sort();
   const districts = [...new Set(allHubs.map(h => h.district).filter(Boolean))].sort();
-  const zones = [...new Set(allHubs.map(h => h.zone).filter(Boolean))].sort();
+  const police_stations = [...new Set(allHubs.map(h => h.police_station).filter(Boolean))].sort();
 
   return {
     divisions: divisions,
     districts: districts,
-    zones: zones,
+    police_stations: police_stations,
     hubs: filtered.slice().sort(function(a, b) {
       return (a.name || "").localeCompare(b.name || "");
     })
@@ -112,8 +112,8 @@ function setDistrictFilter(value) {
   applyFilters();
 }
 
-function setZoneFilter(value) {
-  toggleArrayFilter("zone", value);
+function setPoliceStationFilter(value) {
+  toggleArrayFilter("police_station", value);
   clearActiveSelection("hub");
   applyFilters();
 }
@@ -121,7 +121,7 @@ function setZoneFilter(value) {
 function clearAllFilters() {
   activeFilters.division = [];
   activeFilters.district = [];
-  activeFilters.zone = [];
+  activeFilters.police_station = [];
 
   activeSelection.type = "";
   activeSelection.value = "";
