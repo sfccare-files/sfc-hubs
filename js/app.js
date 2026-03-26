@@ -50,74 +50,14 @@ function initFreshHomeWhenReady() {
     }
 
     tries += 1;
-
     if (tries >= maxTries) {
       clearInterval(timer);
     }
   }, 150);
 }
 
-function initMapControls() {
-  const resetMapBtn = document.getElementById("resetMapBtn");
-  const myLocationBtn = document.getElementById("myLocationBtn");
-  const nearestHubBtn = document.getElementById("nearestHubBtn");
-  const heatmapToggleBtn = document.getElementById("heatmapToggleBtn");
-
-  if (resetMapBtn) {
-    resetMapBtn.addEventListener("click", function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      resetMapView();
-    });
-  }
-
-  if (myLocationBtn) {
-    myLocationBtn.addEventListener("click", function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      goToMyLocation();
-    });
-  }
-
-  if (nearestHubBtn) {
-    nearestHubBtn.addEventListener("click", function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      goToNearestHub();
-    });
-  }
-
-  if (heatmapToggleBtn) {
-    heatmapToggleBtn.addEventListener("click", function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (typeof toggleHeatmap === "function") {
-        toggleHeatmap();
-      }
-    });
-  }
-}
-
-function initQuickAccessPanelDefault() {
-  const quickAccessContent = document.getElementById("quickAccessContent");
-  const quickAccessIcon = document.getElementById("quickAccessToggleIcon");
-
-  if (quickAccessContent) {
-    quickAccessContent.classList.add("hidden");
-  }
-
-  if (quickAccessIcon) {
-    quickAccessIcon.textContent = "+";
-  }
-}
-
 updateDateTime();
 setInterval(updateDateTime, 1000);
-
-if (typeof initBaseMaps === "function") {
-  initBaseMaps();
-}
 
 initTreeToggles();
 
@@ -141,14 +81,39 @@ initSearch();
 initClearFilters();
 loadHubData();
 resetAllSections();
-initQuickAccessPanelDefault();
-initMapControls();
 
 if (typeof initMapLayerControls === "function") {
   initMapLayerControls();
 }
 
 initFreshHomeWhenReady();
+
+const resetMapBtn = document.getElementById("resetMapBtn");
+if (resetMapBtn) {
+  resetMapBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    resetMapView();
+  });
+}
+
+const myLocationBtn = document.getElementById("myLocationBtn");
+if (myLocationBtn) {
+  myLocationBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    goToMyLocation();
+  });
+}
+
+const nearestHubBtn = document.getElementById("nearestHubBtn");
+if (nearestHubBtn) {
+  nearestHubBtn.addEventListener("click", function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    goToNearestHub();
+  });
+}
 
 document.addEventListener("click", function(e) {
   const closeBtn = e.target.closest("#hubDetailsClose");
