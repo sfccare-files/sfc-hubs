@@ -1,7 +1,9 @@
-var DEFAULT_MAP_CENTER = [23.6850, 90.3563];
-var DEFAULT_MAP_ZOOM = 7;
+var map = L.map("map").setView(
+  getConfig().map.defaultCenter,
+  getConfig().map.defaultZoom
+);
 
-var map = L.map("map").setView(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM);
+getState().map = map;
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "© OpenStreetMap"
@@ -16,17 +18,12 @@ var markers = L.markerClusterGroup({
   maxClusterRadius: 45
 });
 
-var hubMarkers = [];
-var allHubs = [];
-var activePulseMarker = null;
-var userLocationMarker = null;
-var lastKnownUserLocation = null;
-var toastTimer = null;
+getState().markersLayer = markers;
 
 map.addLayer(markers);
 
 function hasLoadedHubs() {
-  return Array.isArray(allHubs) && allHubs.length > 0;
+  return Array.isArray(getState().allHubs) && getState().allHubs.length > 0;
 }
 
 function updateVisibleMarkers(filteredHubs) {
@@ -47,8 +44,8 @@ function fitMapToFilteredHubs(filteredHubs) {
   if (!Array.isArray(filteredHubs) || filteredHubs.length === 0) return;
 
   if (filteredHubs.length === 1) {
-    map.flyTo(filteredHubs[0].marker.getLatLng(), 12, {
-      duration: 0.8
+    map.flyTo(filteredHubs[0].marker.getLatLng(), getConfig().map.singleHubZoom, {
+      duration: getConfig().map.flyDuration
     });
     return;
   }
@@ -66,29 +63,23 @@ function fitMapToFilteredHubs(filteredHubs) {
   if (!group.getLayers().length) return;
 
   map.flyToBounds(group.getBounds(), {
-    padding: [30, 30],
-    duration: 0.8
+    padding: getConfig().map.fitPadding,
+    duration: getConfig().map.flyDuration
   });
 }
 
 function focusHubOnMap(hub, zoomLevel) {
   if (!hub || !hub.marker) return;
 
-  if (typeof setActiveSelection === "function") {
-    setActiveSelection("hub", hub.name);
-  } else if (typeof activeSelection !== "undefined") {
-    activeSelection.type = "hub";
-    activeSelection.value = hub.name;
-  }
-
+  setActiveSelection("hub", hub.name);
   addRecentHub(hub);
 
   if (typeof renderTrees === "function") {
     renderTrees();
   }
 
-  map.flyTo(hub.marker.getLatLng(), zoomLevel || 12, {
-    duration: 0.8
+  map.flyTo(hub.marker.getLatLng(), zoomLevel || getConfig().map.focusZoom, {
+    duration: getConfig().map.flyDuration
   });
 
   setTimeout(function() {
@@ -96,10 +87,10 @@ function focusHubOnMap(hub, zoomLevel) {
     pulseMarker(hub.marker);
     scrollToHubTreeItem(hub.name);
 
-    if (lastKnownUserLocation) {
+    if (getState().lastKnownUserLocation) {
       const distance = getDistanceKm(
-        lastKnownUserLocation.lat,
-        lastKnownUserLocation.lng,
+        getState().lastKnownUserLocation.lat,
+        getState().lastKnownUserLocation.lng,
         hub.marker.getLatLng().lat,
         hub.marker.getLatLng().lng
       );
@@ -112,11 +103,11 @@ function focusHubOnMap(hub, zoomLevel) {
 function pulseMarker(marker) {
   if (!marker || !marker._icon) return;
 
-  if (activePulseMarker && activePulseMarker._icon) {
-    activePulseMarker._icon.classList.remove("selected-hub-marker");
+  if (getState().activePulseMarker && getState().activePulseMarker._icon) {
+    getState().activePulseMarker._icon.classList.remove("selected-hub-marker");
   }
 
-  activePulseMarker = marker;
+  getState().activePulseMarker = marker;
   marker._icon.classList.add("selected-hub-marker");
 
   setTimeout(function() {
@@ -127,11 +118,11 @@ function pulseMarker(marker) {
 }
 
 function getCurrentHubDistance(lat, lng) {
-  if (!lastKnownUserLocation) return "";
+  if (!getState().lastKnownUserLocation) return "";
 
   const distance = getDistanceKm(
-    lastKnownUserLocation.lat,
-    lastKnownUserLocation.lng,
+    getState().lastKnownUserLocation.lat,
+    getState().lastKnownUserLocation.lng,
     lat,
     lng
   );
@@ -181,13 +172,11 @@ function hideHubDetailsPanel() {
 function resetMapView() {
   hideHubDetailsPanel();
 
-  if (typeof activeSelection !== "undefined") {
-    activeSelection.type = "";
-    activeSelection.value = "";
-  }
+  getState().selection.type = "";
+  getState().selection.value = "";
 
-  map.flyTo(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM, {
-    duration: 0.8
+  map.flyTo(getConfig().map.defaultCenter, getConfig().map.defaultZoom, {
+    duration: getConfig().map.flyDuration
   });
 
   if (typeof renderTrees === "function") {
@@ -198,9 +187,7 @@ function resetMapView() {
     hideHeatmap();
   }
 
-  if (typeof mapLayerState !== "undefined") {
-    mapLayerState.heatmapEnabled = false;
-  }
+  getState().mapLayerState.heatmapEnabled = false;
 
   if (typeof setHeatmapButtonState === "function") {
     setHeatmapButtonState(false);
@@ -228,7 +215,7 @@ function findNearestHub(lat, lng) {
   let nearestHub = null;
   let nearestDistance = Infinity;
 
-  allHubs.forEach(function(hub) {
+  getState().allHubs.forEach(function(hub) {
     if (!hub || !hub.marker) return;
 
     const hubLat = hub.marker.getLatLng().lat;
@@ -250,15 +237,15 @@ function findNearestHub(lat, lng) {
 }
 
 function clearUserLocationMarker() {
-  if (userLocationMarker && map.hasLayer(userLocationMarker)) {
-    map.removeLayer(userLocationMarker);
+  if (getState().userLocationMarker && map.hasLayer(getState().userLocationMarker)) {
+    map.removeLayer(getState().userLocationMarker);
   }
 }
 
 function setUserLocationMarker(lat, lng) {
   clearUserLocationMarker();
 
-  userLocationMarker = L.circleMarker([lat, lng], {
+  getState().userLocationMarker = L.circleMarker([lat, lng], {
     radius: 8,
     weight: 3,
     color: "#169f64",
@@ -272,17 +259,9 @@ function getGeolocationErrorMessage(error) {
     return "Unable to get your location.";
   }
 
-  if (error.code === 1) {
-    return "Location permission denied.";
-  }
-
-  if (error.code === 2) {
-    return "Location information is unavailable.";
-  }
-
-  if (error.code === 3) {
-    return "Location request timed out.";
-  }
+  if (error.code === 1) return "Location permission denied.";
+  if (error.code === 2) return "Location information is unavailable.";
+  if (error.code === 3) return "Location request timed out.";
 
   return "Unable to get your location.";
 }
@@ -298,11 +277,11 @@ function goToMyLocation() {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
 
-      lastKnownUserLocation = { lat: lat, lng: lng };
+      getState().lastKnownUserLocation = { lat: lat, lng: lng };
       setUserLocationMarker(lat, lng);
 
-      map.flyTo([lat, lng], 13, {
-        duration: 0.8
+      map.flyTo([lat, lng], getConfig().map.nearestZoom, {
+        duration: getConfig().map.flyDuration
       });
 
       if (!hasLoadedHubs()) {
@@ -324,13 +303,9 @@ function goToMyLocation() {
         showMapToast("Your location found.");
       }
 
-      if (
-        typeof activeSelection !== "undefined" &&
-        activeSelection.type === "hub" &&
-        activeSelection.value
-      ) {
-        const activeHub = allHubs.find(function(hub) {
-          return hub.name === activeSelection.value;
+      if (getState().selection.type === "hub" && getState().selection.value) {
+        const activeHub = getState().allHubs.find(function(hub) {
+          return hub.name === getState().selection.value;
         });
 
         if (activeHub) {
@@ -341,11 +316,7 @@ function goToMyLocation() {
     function(error) {
       showMapToast(getGeolocationErrorMessage(error));
     },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    }
+    getConfig().geolocation
   );
 }
 
@@ -359,7 +330,7 @@ function goToNearestHub() {
     const nearestData = findNearestHub(lat, lng);
 
     if (nearestData && nearestData.hub) {
-      focusHubOnMap(nearestData.hub, 13);
+      focusHubOnMap(nearestData.hub, getConfig().map.nearestZoom);
       showMapToast(
         "Nearest hub: " +
           nearestData.hub.name +
@@ -372,8 +343,11 @@ function goToNearestHub() {
     }
   }
 
-  if (lastKnownUserLocation) {
-    openNearestFromLocation(lastKnownUserLocation.lat, lastKnownUserLocation.lng);
+  if (getState().lastKnownUserLocation) {
+    openNearestFromLocation(
+      getState().lastKnownUserLocation.lat,
+      getState().lastKnownUserLocation.lng
+    );
     return;
   }
 
@@ -387,23 +361,19 @@ function goToNearestHub() {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
 
-      lastKnownUserLocation = { lat: lat, lng: lng };
+      getState().lastKnownUserLocation = { lat: lat, lng: lng };
       setUserLocationMarker(lat, lng);
       openNearestFromLocation(lat, lng);
     },
     function(error) {
       showMapToast(getGeolocationErrorMessage(error));
     },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    }
+    getConfig().geolocation
   );
 }
 
 function showMarkerHover(hub, originalEvent) {
-  if (window.innerWidth <= 768) return;
+  if (window.innerWidth <= getConfig().ui.mobileBreakpoint) return;
 
   const card = document.getElementById("markerHoverCard");
   if (!card || !hub || !originalEvent) return;
@@ -414,12 +384,12 @@ function showMarkerHover(hub, originalEvent) {
   let left = point.x + 16;
   let top = point.y - 14;
 
-  if (left > mapSize.x - 190) {
-    left = point.x - 190;
+  if (left > mapSize.x - getConfig().ui.hoverCardMaxWidth) {
+    left = point.x - getConfig().ui.hoverCardMaxWidth;
   }
 
-  if (top > mapSize.y - 90) {
-    top = mapSize.y - 90;
+  if (top > mapSize.y - getConfig().ui.hoverCardMaxHeight) {
+    top = mapSize.y - getConfig().ui.hoverCardMaxHeight;
   }
 
   if (top < 10) {
@@ -430,11 +400,11 @@ function showMarkerHover(hub, originalEvent) {
   card.style.top = top + "px";
 
   card.innerHTML =
-    '<div class="marker-hover-title">' + (hub.name || "") + "</div>" +
+    '<div class="marker-hover-title">' + escapeHtmlText(hub.name || "") + "</div>" +
     '<div class="marker-hover-meta">' +
-      (hub.district || "-") + " • " + (hub.division || "-") +
+      escapeHtmlText(hub.district || "-") + " • " + escapeHtmlText(hub.division || "-") +
     "</div>" +
-    '<div class="marker-hover-meta">Police Station: ' + (hub.police_station || "-") + "</div>";
+    '<div class="marker-hover-meta">Police Station: ' + escapeHtmlText(hub.police_station || "-") + "</div>";
 
   card.classList.remove("hidden");
 }
@@ -452,8 +422,8 @@ function showMapToast(message) {
   toast.textContent = message;
   toast.classList.remove("hidden");
 
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(function() {
+  clearTimeout(getState().toastTimer);
+  getState().toastTimer = setTimeout(function() {
     toast.classList.add("hidden");
-  }, 2400);
+  }, getConfig().ui.toastDuration);
 }

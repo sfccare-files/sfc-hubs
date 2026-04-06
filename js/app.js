@@ -27,13 +27,11 @@ function safeCall(fnName) {
 
 function initFreshHomeWhenReady() {
   let tries = 0;
-  const maxTries = 100;
 
   const timer = setInterval(function() {
     const hubsReady =
-      typeof allHubs !== "undefined" &&
-      Array.isArray(allHubs) &&
-      allHubs.length > 0;
+      Array.isArray(getState().allHubs) &&
+      getState().allHubs.length > 0;
 
     if (hubsReady) {
       clearInterval(timer);
@@ -43,7 +41,7 @@ function initFreshHomeWhenReady() {
       }
 
       if (typeof updateVisibleMarkers === "function") {
-        updateVisibleMarkers(allHubs);
+        updateVisibleMarkers(getState().allHubs);
       }
 
       if (typeof resetMapView === "function") {
@@ -67,18 +65,14 @@ function initFreshHomeWhenReady() {
 
     tries += 1;
 
-    if (tries >= maxTries) {
+    if (tries >= getConfig().app.startupMaxTries) {
       clearInterval(timer);
 
-      if (
-        typeof window.hubLoadStats !== "undefined" &&
-        window.hubLoadStats &&
-        window.hubLoadStats.validRows === 0
-      ) {
+      if (getState().loadStats && getState().loadStats.validRows === 0) {
         console.warn("Hub data did not become ready during startup.");
       }
     }
-  }, 150);
+  }, getConfig().app.startupCheckIntervalMs);
 }
 
 function bindMapToolButton(id, handler) {

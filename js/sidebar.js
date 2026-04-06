@@ -1,23 +1,5 @@
-function safeReadStoredList(key) {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(key) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (error) {
-    console.warn("Failed to parse localStorage list for key:", key, error);
-    return [];
-  }
-}
-
-let recentHubs = safeReadStoredList("sfc_recent_hubs");
-let favoriteHubs = safeReadStoredList("sfc_favorite_hubs");
-
-function saveStoredList(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.warn("Failed to write localStorage list for key:", key, error);
-  }
-}
+getState().storage.recentHubs = safeReadStoredList("sfc_recent_hubs");
+getState().storage.favoriteHubs = safeReadStoredList("sfc_favorite_hubs");
 
 function renderTrees() {
   const data = getCrossFilteredValues();
@@ -37,7 +19,7 @@ function renderHubTree(hubs) {
 
   hubTree.innerHTML = "";
 
-  if (!Array.isArray(allHubs) || allHubs.length === 0) {
+  if (!Array.isArray(getState().allHubs) || getState().allHubs.length === 0) {
     hubTree.innerHTML =
       '<div class="tree-item empty-tree">Hub data is not available yet.</div>';
     return;
@@ -60,20 +42,20 @@ function renderHubTree(hubs) {
     link.className = "tree-link";
     link.textContent = hub.name;
 
-    if (activeSelection.type === "hub" && activeSelection.value === hub.name) {
+    if (getState().selection.type === "hub" && getState().selection.value === hub.name) {
       link.classList.add("active-item");
     }
 
     link.addEventListener("click", function() {
-      if (activeSelection.type === "hub" && activeSelection.value === hub.name) {
-        activeSelection.type = "";
-        activeSelection.value = "";
+      if (getState().selection.type === "hub" && getState().selection.value === hub.name) {
+        getState().selection.type = "";
+        getState().selection.value = "";
         hideHubDetailsPanel();
         renderTrees();
         return;
       }
 
-      focusHubOnMap(hub, 12);
+      focusHubOnMap(hub, getConfig().map.focusZoom);
     });
 
     item.appendChild(link);
@@ -87,7 +69,7 @@ function renderClickableTree(containerId, items, clickHandler, type) {
 
   container.innerHTML = "";
 
-  if (!Array.isArray(allHubs) || allHubs.length === 0) {
+  if (!Array.isArray(getState().allHubs) || getState().allHubs.length === 0) {
     container.innerHTML = '<div class="tree-item empty-tree">No data</div>';
     return;
   }
@@ -105,15 +87,15 @@ function renderClickableTree(containerId, items, clickHandler, type) {
     link.className = "tree-link";
     link.textContent = itemValue;
 
-    if (type === "division" && activeFilters.division.includes(itemValue)) {
+    if (type === "division" && getState().filters.division.includes(itemValue)) {
       link.classList.add("active-item");
     }
 
-    if (type === "district" && activeFilters.district.includes(itemValue)) {
+    if (type === "district" && getState().filters.district.includes(itemValue)) {
       link.classList.add("active-item");
     }
 
-    if (type === "police_station" && activeFilters.police_station.includes(itemValue)) {
+    if (type === "police_station" && getState().filters.police_station.includes(itemValue)) {
       link.classList.add("active-item");
     }
 
@@ -129,25 +111,25 @@ function renderClickableTree(containerId, items, clickHandler, type) {
 function addRecentHub(hub) {
   if (!hub || !hub.name) return;
 
-  recentHubs = recentHubs.filter(function(item) {
+  getState().storage.recentHubs = getState().storage.recentHubs.filter(function(item) {
     return item.name !== hub.name;
   });
 
-  recentHubs.unshift({
+  getState().storage.recentHubs.unshift({
     name: hub.name,
     district: hub.district || "",
     police_station: hub.police_station || ""
   });
 
-  if (recentHubs.length > 5) {
-    recentHubs.pop();
+  if (getState().storage.recentHubs.length > getConfig().sidebar.maxRecentHubs) {
+    getState().storage.recentHubs.pop();
   }
 
-  saveStoredList("sfc_recent_hubs", recentHubs);
+  saveStoredList("sfc_recent_hubs", getState().storage.recentHubs);
 }
 
 function isFavoriteHub(hubName) {
-  return favoriteHubs.some(function(h) {
+  return getState().storage.favoriteHubs.some(function(h) {
     return h.name === hubName;
   });
 }
@@ -155,24 +137,24 @@ function isFavoriteHub(hubName) {
 function toggleFavoriteHub(hub) {
   if (!hub || !hub.name) return;
 
-  const index = favoriteHubs.findIndex(function(item) {
+  const index = getState().storage.favoriteHubs.findIndex(function(item) {
     return item.name === hub.name;
   });
 
   if (index > -1) {
-    favoriteHubs.splice(index, 1);
+    getState().storage.favoriteHubs.splice(index, 1);
   } else {
-    favoriteHubs.unshift({
+    getState().storage.favoriteHubs.unshift({
       name: hub.name,
       district: hub.district || "",
       police_station: hub.police_station || ""
     });
   }
 
-  saveStoredList("sfc_favorite_hubs", favoriteHubs);
+  saveStoredList("sfc_favorite_hubs", getState().storage.favoriteHubs);
   updateQuickAccessPreview();
 
-  if (activeSelection.type === "hub" && activeSelection.value === hub.name) {
+  if (getState().selection.type === "hub" && getState().selection.value === hub.name) {
     showHubDetailsPanel(hub);
   }
 }
@@ -183,23 +165,23 @@ function renderFavoritesList() {
 
   favoriteList.innerHTML = "";
 
-  if (favoriteHubs.length === 0) {
+  if (getState().storage.favoriteHubs.length === 0) {
     favoriteList.innerHTML = '<div class="quick-empty">No favorite hubs yet</div>';
     return;
   }
 
-  favoriteHubs.forEach(function(hub) {
+  getState().storage.favoriteHubs.forEach(function(hub) {
     const item = document.createElement("div");
     item.className = "quick-list-item";
     item.innerHTML =
-      '<div class="quick-list-item-name">' + escapeSidebarText(hub.name || "") + "</div>" +
+      '<div class="quick-list-item-name">' + escapeHtmlText(hub.name || "") + "</div>" +
       '<div class="quick-list-item-meta">' +
-        escapeSidebarText(hub.district || "") +
-        (hub.police_station ? " • " + escapeSidebarText(hub.police_station) : "") +
+        escapeHtmlText(hub.district || "") +
+        (hub.police_station ? " • " + escapeHtmlText(hub.police_station) : "") +
       "</div>";
 
     item.addEventListener("click", function() {
-      const target = allHubs.find(function(h) {
+      const target = getState().allHubs.find(function(h) {
         return h.name === hub.name;
       });
 
@@ -208,7 +190,7 @@ function renderFavoritesList() {
         return;
       }
 
-      focusHubOnMap(target, 12);
+      focusHubOnMap(target, getConfig().map.focusZoom);
     });
 
     favoriteList.appendChild(item);
@@ -221,23 +203,23 @@ function renderRecentHubList() {
 
   recentList.innerHTML = "";
 
-  if (recentHubs.length === 0) {
+  if (getState().storage.recentHubs.length === 0) {
     recentList.innerHTML = '<div class="quick-empty">No recent hubs yet</div>';
     return;
   }
 
-  recentHubs.forEach(function(hub) {
+  getState().storage.recentHubs.forEach(function(hub) {
     const item = document.createElement("div");
     item.className = "quick-list-item";
     item.innerHTML =
-      '<div class="quick-list-item-name">' + escapeSidebarText(hub.name || "") + "</div>" +
+      '<div class="quick-list-item-name">' + escapeHtmlText(hub.name || "") + "</div>" +
       '<div class="quick-list-item-meta">' +
-        escapeSidebarText(hub.district || "") +
-        (hub.police_station ? " • " + escapeSidebarText(hub.police_station) : "") +
+        escapeHtmlText(hub.district || "") +
+        (hub.police_station ? " • " + escapeHtmlText(hub.police_station) : "") +
       "</div>";
 
     item.addEventListener("click", function() {
-      const target = allHubs.find(function(h) {
+      const target = getState().allHubs.find(function(h) {
         return h.name === hub.name;
       });
 
@@ -246,7 +228,7 @@ function renderRecentHubList() {
         return;
       }
 
-      focusHubOnMap(target, 12);
+      focusHubOnMap(target, getConfig().map.focusZoom);
     });
 
     recentList.appendChild(item);
@@ -260,17 +242,17 @@ function updateQuickAccessPreview() {
 
   if (selectedHubLabel) {
     selectedHubLabel.textContent =
-      activeSelection.type === "hub"
-        ? activeSelection.value
+      getState().selection.type === "hub"
+        ? getState().selection.value
         : "None selected";
   }
 
   if (favoriteHubCount) {
-    favoriteHubCount.textContent = favoriteHubs.length + " hubs";
+    favoriteHubCount.textContent = getState().storage.favoriteHubs.length + " hubs";
   }
 
   if (recentHubCount) {
-    recentHubCount.textContent = recentHubs.length + " hubs";
+    recentHubCount.textContent = getState().storage.recentHubs.length + " hubs";
   }
 
   renderFavoritesList();
@@ -485,12 +467,4 @@ function scrollToHubTreeItem(name) {
       });
     }
   }, 100);
-}
-
-function escapeSidebarText(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }

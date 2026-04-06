@@ -1,8 +1,5 @@
-var activeSuggestionIndex = -1;
-var currentSuggestions = [];
-
 function hasSearchableHubData() {
-  return Array.isArray(allHubs) && allHubs.length > 0;
+  return Array.isArray(getState().allHubs) && getState().allHubs.length > 0;
 }
 
 function initSearch() {
@@ -11,11 +8,11 @@ function initSearch() {
 
   if (!searchBox || !suggestionsBox) return;
 
-  searchBox.addEventListener("input", function() {
-    const value = this.value.toLowerCase().trim();
+  const handleInput = debounce(function() {
+    const value = searchBox.value.toLowerCase().trim();
 
     if (!hasSearchableHubData()) {
-      currentSuggestions = [];
+      getState().search.currentSuggestions = [];
       renderSearchSuggestions([], true);
       return;
     }
@@ -43,7 +40,7 @@ function initSearch() {
       hideHubDetailsPanel();
     }
 
-    currentSuggestions = allHubs
+    getState().search.currentSuggestions = getState().allHubs
       .filter(function(hub) {
         const name = (hub.name || "").toLowerCase();
         const division = (hub.division || "").toLowerCase();
@@ -60,33 +57,43 @@ function initSearch() {
       .sort(function(a, b) {
         return (a.name || "").localeCompare(b.name || "");
       })
-      .slice(0, 8);
+      .slice(0, getConfig().search.suggestionLimit);
 
-    renderSearchSuggestions(currentSuggestions, false);
-  });
+    renderSearchSuggestions(getState().search.currentSuggestions, false);
+  }, getConfig().search.debounceMs);
+
+  searchBox.addEventListener("input", handleInput);
 
   searchBox.addEventListener("keydown", function(e) {
-    if (currentSuggestions.length === 0) return;
+    if (getState().search.currentSuggestions.length === 0) return;
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      activeSuggestionIndex = Math.min(
-        activeSuggestionIndex + 1,
-        currentSuggestions.length - 1
+      getState().search.activeSuggestionIndex = Math.min(
+        getState().search.activeSuggestionIndex + 1,
+        getState().search.currentSuggestions.length - 1
       );
       updateSuggestionActiveState();
     }
 
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+      getState().search.activeSuggestionIndex = Math.max(
+        getState().search.activeSuggestionIndex - 1,
+        0
+      );
       updateSuggestionActiveState();
     }
 
     if (e.key === "Enter") {
-      if (activeSuggestionIndex >= 0 && currentSuggestions[activeSuggestionIndex]) {
+      if (
+        getState().search.activeSuggestionIndex >= 0 &&
+        getState().search.currentSuggestions[getState().search.activeSuggestionIndex]
+      ) {
         e.preventDefault();
-        selectSearchSuggestion(currentSuggestions[activeSuggestionIndex]);
+        selectSearchSuggestion(
+          getState().search.currentSuggestions[getState().search.activeSuggestionIndex]
+        );
       }
     }
 
@@ -107,7 +114,7 @@ function renderSearchSuggestions(suggestions, noDataMode) {
   if (!suggestionsBox) return;
 
   suggestionsBox.innerHTML = "";
-  activeSuggestionIndex = -1;
+  getState().search.activeSuggestionIndex = -1;
 
   if (noDataMode) {
     suggestionsBox.innerHTML =
@@ -136,11 +143,11 @@ function renderSearchSuggestions(suggestions, noDataMode) {
     item.className = "search-suggestion-item";
 
     item.innerHTML =
-      '<div class="search-suggestion-title">' + escapeSearchText(hub.name || "") + "</div>" +
+      '<div class="search-suggestion-title">' + escapeHtmlText(hub.name || "") + "</div>" +
       '<div class="search-suggestion-meta">' +
-        escapeSearchText(hub.district || "-") + " • " +
-        escapeSearchText(hub.division || "-") + " • " +
-        escapeSearchText(hub.police_station || "-") +
+        escapeHtmlText(hub.district || "-") + " • " +
+        escapeHtmlText(hub.division || "-") + " • " +
+        escapeHtmlText(hub.police_station || "-") +
       "</div>";
 
     item.addEventListener("click", function() {
@@ -148,7 +155,7 @@ function renderSearchSuggestions(suggestions, noDataMode) {
     });
 
     item.addEventListener("mouseenter", function() {
-      activeSuggestionIndex = index;
+      getState().search.activeSuggestionIndex = index;
       updateSuggestionActiveState();
     });
 
@@ -162,7 +169,7 @@ function updateSuggestionActiveState() {
   const items = document.querySelectorAll(".search-suggestion-item");
 
   items.forEach(function(item, index) {
-    item.classList.toggle("active", index === activeSuggestionIndex);
+    item.classList.toggle("active", index === getState().search.activeSuggestionIndex);
   });
 }
 
@@ -172,8 +179,8 @@ function hideSearchSuggestions() {
 
   suggestionsBox.classList.add("hidden");
   suggestionsBox.innerHTML = "";
-  activeSuggestionIndex = -1;
-  currentSuggestions = [];
+  getState().search.activeSuggestionIndex = -1;
+  getState().search.currentSuggestions = [];
 }
 
 function selectSearchSuggestion(hub) {
@@ -183,19 +190,11 @@ function selectSearchSuggestion(hub) {
   searchBox.value = hub.name || "";
   hideSearchSuggestions();
 
-  activeSelection.type = "hub";
-  activeSelection.value = hub.name || "";
+  getState().selection.type = "hub";
+  getState().selection.value = hub.name || "";
 
   updateVisibleMarkers([hub]);
   renderTrees();
-  focusHubOnMap(hub, 13);
+  focusHubOnMap(hub, getConfig().map.nearestZoom);
   scrollToHubTreeItem(hub.name);
-}
-
-function escapeSearchText(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }

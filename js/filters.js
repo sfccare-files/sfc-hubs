@@ -1,23 +1,12 @@
-var activeFilters = {
-  division: [],
-  district: [],
-  police_station: []
-};
-
-var activeSelection = {
-  type: "",
-  value: ""
-};
-
 function setActiveSelection(type, value) {
-  activeSelection.type = type;
-  activeSelection.value = value;
+  getState().selection.type = type;
+  getState().selection.value = value;
 }
 
 function clearActiveSelection(type) {
-  if (activeSelection.type === type) {
-    activeSelection.type = "";
-    activeSelection.value = "";
+  if (getState().selection.type === type) {
+    getState().selection.type = "";
+    getState().selection.value = "";
   }
 }
 
@@ -44,24 +33,24 @@ function matchesSearch(hub, searchValue) {
 }
 
 function getFilteredHubs() {
-  if (!Array.isArray(allHubs) || allHubs.length === 0) {
+  if (!Array.isArray(getState().allHubs) || getState().allHubs.length === 0) {
     return [];
   }
 
   const searchValue = getSearchValue();
 
-  return allHubs.filter(function(hub) {
+  return getState().allHubs.filter(function(hub) {
     const matchDivision =
-      activeFilters.division.length === 0 ||
-      activeFilters.division.includes(hub.division);
+      getState().filters.division.length === 0 ||
+      getState().filters.division.includes(hub.division);
 
     const matchDistrict =
-      activeFilters.district.length === 0 ||
-      activeFilters.district.includes(hub.district);
+      getState().filters.district.length === 0 ||
+      getState().filters.district.includes(hub.district);
 
     const matchPoliceStation =
-      activeFilters.police_station.length === 0 ||
-      activeFilters.police_station.includes(hub.police_station);
+      getState().filters.police_station.length === 0 ||
+      getState().filters.police_station.includes(hub.police_station);
 
     const matchSearch = matchesSearch(hub, searchValue);
 
@@ -70,7 +59,7 @@ function getFilteredHubs() {
 }
 
 function getCrossFilteredValues() {
-  if (!Array.isArray(allHubs) || allHubs.length === 0) {
+  if (!Array.isArray(getState().allHubs) || getState().allHubs.length === 0) {
     return {
       divisions: [],
       districts: [],
@@ -82,42 +71,42 @@ function getCrossFilteredValues() {
   const searchValue = getSearchValue();
   const filtered = getFilteredHubs();
 
-  const divisionScopedHubs = allHubs.filter(function(hub) {
+  const divisionScopedHubs = getState().allHubs.filter(function(hub) {
     const matchDivision =
-      activeFilters.division.length === 0 ||
-      activeFilters.division.includes(hub.division);
+      getState().filters.division.length === 0 ||
+      getState().filters.division.includes(hub.division);
 
     const matchDistrict =
-      activeFilters.district.length === 0 ||
-      activeFilters.district.includes(hub.district);
+      getState().filters.district.length === 0 ||
+      getState().filters.district.includes(hub.district);
 
     const matchPoliceStation =
-      activeFilters.police_station.length === 0 ||
-      activeFilters.police_station.includes(hub.police_station);
+      getState().filters.police_station.length === 0 ||
+      getState().filters.police_station.includes(hub.police_station);
 
     return matchDivision && matchDistrict && matchPoliceStation && matchesSearch(hub, searchValue);
   });
 
-  const districtScopedHubs = allHubs.filter(function(hub) {
+  const districtScopedHubs = getState().allHubs.filter(function(hub) {
     const matchDivision =
-      activeFilters.division.length === 0 ||
-      activeFilters.division.includes(hub.division);
+      getState().filters.division.length === 0 ||
+      getState().filters.division.includes(hub.division);
 
     const matchPoliceStation =
-      activeFilters.police_station.length === 0 ||
-      activeFilters.police_station.includes(hub.police_station);
+      getState().filters.police_station.length === 0 ||
+      getState().filters.police_station.includes(hub.police_station);
 
     return matchDivision && matchPoliceStation && matchesSearch(hub, searchValue);
   });
 
-  const policeStationScopedHubs = allHubs.filter(function(hub) {
+  const policeStationScopedHubs = getState().allHubs.filter(function(hub) {
     const matchDivision =
-      activeFilters.division.length === 0 ||
-      activeFilters.division.includes(hub.division);
+      getState().filters.division.length === 0 ||
+      getState().filters.division.includes(hub.division);
 
     const matchDistrict =
-      activeFilters.district.length === 0 ||
-      activeFilters.district.includes(hub.district);
+      getState().filters.district.length === 0 ||
+      getState().filters.district.includes(hub.district);
 
     return matchDivision && matchDistrict && matchesSearch(hub, searchValue);
   });
@@ -176,7 +165,7 @@ function applyFilters() {
 }
 
 function toggleArrayFilter(filterKey, value) {
-  const list = activeFilters[filterKey];
+  const list = getState().filters[filterKey];
   if (!Array.isArray(list)) return;
 
   const index = list.indexOf(value);
@@ -189,24 +178,24 @@ function toggleArrayFilter(filterKey, value) {
 }
 
 function removeInvalidDependentFilters() {
-  if (!Array.isArray(allHubs) || allHubs.length === 0) {
-    activeFilters.district = [];
-    activeFilters.police_station = [];
+  if (!Array.isArray(getState().allHubs) || getState().allHubs.length === 0) {
+    getState().filters.district = [];
+    getState().filters.police_station = [];
     return;
   }
 
   const searchValue = getSearchValue();
 
   const validDistricts = new Set(
-    allHubs
+    getState().allHubs
       .filter(function(hub) {
         const matchDivision =
-          activeFilters.division.length === 0 ||
-          activeFilters.division.includes(hub.division);
+          getState().filters.division.length === 0 ||
+          getState().filters.division.includes(hub.division);
 
         const matchPoliceStation =
-          activeFilters.police_station.length === 0 ||
-          activeFilters.police_station.includes(hub.police_station);
+          getState().filters.police_station.length === 0 ||
+          getState().filters.police_station.includes(hub.police_station);
 
         return matchDivision && matchPoliceStation && matchesSearch(hub, searchValue);
       })
@@ -217,15 +206,15 @@ function removeInvalidDependentFilters() {
   );
 
   const validPoliceStations = new Set(
-    allHubs
+    getState().allHubs
       .filter(function(hub) {
         const matchDivision =
-          activeFilters.division.length === 0 ||
-          activeFilters.division.includes(hub.division);
+          getState().filters.division.length === 0 ||
+          getState().filters.division.includes(hub.division);
 
         const matchDistrict =
-          activeFilters.district.length === 0 ||
-          activeFilters.district.includes(hub.district);
+          getState().filters.district.length === 0 ||
+          getState().filters.district.includes(hub.district);
 
         return matchDivision && matchDistrict && matchesSearch(hub, searchValue);
       })
@@ -235,11 +224,11 @@ function removeInvalidDependentFilters() {
       .filter(Boolean)
   );
 
-  activeFilters.district = activeFilters.district.filter(function(district) {
+  getState().filters.district = getState().filters.district.filter(function(district) {
     return validDistricts.has(district);
   });
 
-  activeFilters.police_station = activeFilters.police_station.filter(function(policeStation) {
+  getState().filters.police_station = getState().filters.police_station.filter(function(policeStation) {
     return validPoliceStations.has(policeStation);
   });
 }
@@ -266,12 +255,12 @@ function setPoliceStationFilter(value) {
 }
 
 function clearAllFilters() {
-  activeFilters.division = [];
-  activeFilters.district = [];
-  activeFilters.police_station = [];
+  getState().filters.division = [];
+  getState().filters.district = [];
+  getState().filters.police_station = [];
 
-  activeSelection.type = "";
-  activeSelection.value = "";
+  getState().selection.type = "";
+  getState().selection.value = "";
 
   const searchBox = document.getElementById("searchBox");
   if (searchBox) {
@@ -281,10 +270,10 @@ function clearAllFilters() {
   hideSearchSuggestions();
   hideHubDetailsPanel();
 
-  if (Array.isArray(allHubs) && allHubs.length > 0) {
-    updateVisibleMarkers(allHubs);
+  if (Array.isArray(getState().allHubs) && getState().allHubs.length > 0) {
+    updateVisibleMarkers(getState().allHubs);
     renderTrees();
-    fitMapToFilteredHubs(allHubs);
+    fitMapToFilteredHubs(getState().allHubs);
   } else {
     updateVisibleMarkers([]);
     renderTrees();

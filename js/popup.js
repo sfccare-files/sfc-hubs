@@ -27,15 +27,17 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
   }
 
   function phoneBox(label, value) {
+    const safeValue = value || "";
+
     return `
-      <div class="box box-copy phone-copy-target" data-phone-value="${escapeHtmlAttr(value || "")}">
-        <div class="box-copy-text"><b>${label}:</b> ${value || ""}</div>
+      <div class="box box-copy phone-copy-target" data-phone-value="${escapeHtmlAttr(safeValue)}">
+        <div class="box-copy-text"><b>${label}:</b> ${escapeHtmlText(safeValue)}</div>
         <button
           class="inline-copy-btn"
-          onclick='copyTextValue(${JSON.stringify(value || "")}, ${JSON.stringify(label)}, this)'
+          onclick='copyTextValue(${JSON.stringify(safeValue)}, ${JSON.stringify(label)}, this)'
           aria-label="Copy ${label}"
           title="Copy ${label}"
-          ${value ? "" : "disabled"}>
+          ${safeValue ? "" : "disabled"}>
           ${copyIcon(label)}
         </button>
       </div>
@@ -55,23 +57,23 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
       <div class="hub-popup-body">
         <h2 class="title">Hub Details</h2>
 
-        <div class="box"><b>Name:</b> ${hub.name || ""}</div>
-        <div class="box"><b>Address:</b> ${hub.address || ""}</div>
+        <div class="box"><b>Name:</b> ${escapeHtmlText(hub.name || "")}</div>
+        <div class="box"><b>Address:</b> ${escapeHtmlText(hub.address || "")}</div>
 
         <div class="grid2">
-          <div class="box"><b>Hub ID:</b> ${hub.hub_id || ""}</div>
-          <div class="box"><b>Distance:</b> ${distanceValue}</div>
+          <div class="box"><b>Hub ID:</b> ${escapeHtmlText(hub.hub_id || "")}</div>
+          <div class="box"><b>Distance:</b> ${escapeHtmlText(distanceValue)}</div>
         </div>
 
         <div class="grid2">
-          <div class="box"><b>District:</b> ${hub.district || ""}</div>
-          <div class="box"><b>Division:</b> ${hub.division || ""}</div>
+          <div class="box"><b>District:</b> ${escapeHtmlText(hub.district || "")}</div>
+          <div class="box"><b>Division:</b> ${escapeHtmlText(hub.division || "")}</div>
         </div>
 
-        <div class="box"><b>Police Station:</b> ${policeStation}</div>
+        <div class="box"><b>Police Station:</b> ${escapeHtmlText(policeStation)}</div>
 
         <div class="grid2">
-          <div class="box"><b>Zonal Manager:</b> ${zonalManager}</div>
+          <div class="box"><b>Zonal Manager:</b> ${escapeHtmlText(zonalManager)}</div>
           ${phoneBox("Phone", zonalManagerPhone)}
         </div>
 
@@ -91,22 +93,22 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
         <div class="section">Contact Details</div>
 
         <div class="grid2">
-          <div class="box"><b>Hub IP:</b> ${hub.hub_ip || ""}</div>
+          <div class="box"><b>Hub IP:</b> ${escapeHtmlText(hub.hub_ip || "")}</div>
           ${phoneBox("Hub Phone", hub.hub_phone || "")}
         </div>
 
         <div class="grid2">
-          <div class="box"><b>Manager:</b> ${hub.manager || ""}</div>
+          <div class="box"><b>Manager:</b> ${escapeHtmlText(hub.manager || "")}</div>
           ${phoneBox("Phone", hub.manager_phone || "")}
         </div>
 
         <div class="grid2">
-          <div class="box"><b>Asst. Manager:</b> ${hub.assistant_manager || ""}</div>
+          <div class="box"><b>Asst. Manager:</b> ${escapeHtmlText(hub.assistant_manager || "")}</div>
           ${phoneBox("Phone", hub.assistant_manager_phone || "")}
         </div>
 
         <div class="grid2">
-          <div class="box"><b>Team Leader:</b> ${teamLeader}</div>
+          <div class="box"><b>Team Leader:</b> ${escapeHtmlText(teamLeader)}</div>
           ${phoneBox("Phone", teamLeaderPhone)}
         </div>
       </div>
@@ -120,14 +122,14 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
           <button
             class="secondary-action-btn"
             onclick='callPhone(${JSON.stringify(preferredPhone)})'
-            ${preferredPhone ? "" : "disabled"}>
+            ${isCallablePhone(preferredPhone) ? "" : "disabled"}>
             📞 Call
           </button>
 
           <button
             class="secondary-action-btn"
             onclick='openWhatsappGroup(${JSON.stringify(whatsappGroup)})'
-            ${whatsappGroup ? "" : "disabled"}>
+            ${isValidWhatsappGroupLink(whatsappGroup) ? "" : "disabled"}>
             💬 Whatsapp
           </button>
 
@@ -143,7 +145,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
 }
 
 function toggleFavoriteFromPopup(hubName) {
-  const hub = allHubs.find(function(item) {
+  const hub = getState().allHubs.find(function(item) {
     return item.name === hubName;
   });
 
@@ -153,28 +155,35 @@ function toggleFavoriteFromPopup(hubName) {
 }
 
 function openDirections(lat, lng) {
-  const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  if (typeof lat !== "number" || typeof lng !== "number") {
+    showMapToast("Directions are not available.");
+    return;
+  }
+
+  const url = "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lng;
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
 function callPhone(phone) {
-  if (!phone) {
+  const normalizedPhone = normalizePhoneForCall(phone);
+
+  if (!isCallablePhone(normalizedPhone)) {
     showMapToast("Phone number not available.");
     return;
   }
 
-  window.location.href = `tel:${phone}`;
+  window.location.href = "tel:" + normalizedPhone;
 }
 
 function openWhatsappGroup(link) {
-  if (!link) {
+  const trimmedLink = String(link || "").trim();
+
+  if (!trimmedLink) {
     showMapToast("Whatsapp group link not available.");
     return;
   }
 
-  const trimmedLink = String(link).trim();
-
-  if (!trimmedLink.startsWith("https://chat.whatsapp.com/")) {
+  if (!isValidWhatsappGroupLink(trimmedLink)) {
     showMapToast("Invalid Whatsapp group link.");
     return;
   }
@@ -244,7 +253,7 @@ function showCopySuccess(triggerEl) {
 }
 
 function highlightPhoneBox(triggerEl) {
-  if (!triggerEl || window.innerWidth > 768) return;
+  if (!triggerEl || window.innerWidth > getConfig().ui.mobileBreakpoint) return;
 
   const targetBox = triggerEl.closest(".phone-copy-target");
   if (!targetBox) return;
@@ -255,12 +264,4 @@ function highlightPhoneBox(triggerEl) {
   targetBox._tapTimer = setTimeout(function() {
     targetBox.classList.remove("phone-tap-active");
   }, 700);
-}
-
-function escapeHtmlAttr(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 }

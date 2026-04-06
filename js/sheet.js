@@ -1,19 +1,5 @@
-const sheetURL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSYDLFsB6QUf0Vf0kL-COmVR3eh0jXOLnBG1r6stjL7hVf8-kvpV-KjCAv9R9QKAO0C6E00XGfw7I0q/pub?output=csv";
-
-window.hubLoadStats = {
-  totalRows: 0,
-  validRows: 0,
-  invalidRows: 0,
-  duplicateRows: 0,
-  blankRows: 0,
-  invalidCoordRows: 0,
-  missingNameRows: 0,
-  parseErrors: 0
-};
-
 function resetHubLoadStats() {
-  window.hubLoadStats = {
+  getState().loadStats = {
     totalRows: 0,
     validRows: 0,
     invalidRows: 0,
@@ -53,19 +39,6 @@ function showLoadError(message) {
   if (typeof showMapToast === "function") {
     showMapToast(finalMessage);
   }
-}
-
-function normalizeHeaderKey(key) {
-  return String(key || "")
-    .replace(/^\uFEFF/, "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "_");
-}
-
-function normalizeCellValue(value) {
-  if (value === null || value === undefined) return "";
-  return String(value).trim();
 }
 
 function normalizeHubRow(row) {
@@ -111,19 +84,6 @@ function isCompletelyBlankHubRow(hub) {
   );
 }
 
-function parseCoordinate(value) {
-  if (value === "") return NaN;
-  return parseFloat(String(value).replace(/,/g, "").trim());
-}
-
-function isValidLatitude(lat) {
-  return !isNaN(lat) && lat >= -90 && lat <= 90;
-}
-
-function isValidLongitude(lng) {
-  return !isNaN(lng) && lng >= -180 && lng <= 180;
-}
-
 function buildDuplicateKey(hub, lat, lng) {
   return [
     (hub.name || "").toLowerCase(),
@@ -137,13 +97,8 @@ function clearExistingHubData() {
     markers.clearLayers();
   }
 
-  if (Array.isArray(hubMarkers)) {
-    hubMarkers.length = 0;
-  }
-
-  if (Array.isArray(allHubs)) {
-    allHubs.length = 0;
-  }
+  getState().hubMarkers.length = 0;
+  getState().allHubs.length = 0;
 }
 
 function showLoadSummary(stats) {
@@ -183,7 +138,7 @@ function logLoadSummary(stats) {
 
 function attachMarkerEvents(marker) {
   marker.on("click", function() {
-    const matchedHub = allHubs.find(function(item) {
+    const matchedHub = getState().allHubs.find(function(item) {
       return item.marker === marker;
     });
 
@@ -196,7 +151,7 @@ function attachMarkerEvents(marker) {
   });
 
   marker.on("mouseover", function(e) {
-    const matchedHub = allHubs.find(function(item) {
+    const matchedHub = getState().allHubs.find(function(item) {
       return item.marker === marker;
     });
 
@@ -206,7 +161,7 @@ function attachMarkerEvents(marker) {
   });
 
   marker.on("mousemove", function(e) {
-    const matchedHub = allHubs.find(function(item) {
+    const matchedHub = getState().allHubs.find(function(item) {
       return item.marker === marker;
     });
 
@@ -224,7 +179,7 @@ function loadHubData() {
   resetHubLoadStats();
   clearExistingHubData();
 
-  Papa.parse(sheetURL, {
+  Papa.parse(getConfig().sheetURL, {
     download: true,
     header: true,
     skipEmptyLines: true,
@@ -232,19 +187,19 @@ function loadHubData() {
       const rows = Array.isArray(results.data) ? results.data : [];
       const duplicateTracker = new Set();
 
-      window.hubLoadStats.totalRows = rows.length;
+      getState().loadStats.totalRows = rows.length;
 
       rows.forEach(function(rawHub, index) {
         const hub = normalizeHubRow(rawHub);
 
         if (isCompletelyBlankHubRow(hub)) {
-          window.hubLoadStats.blankRows += 1;
+          getState().loadStats.blankRows += 1;
           return;
         }
 
         if (!hub.name) {
-          window.hubLoadStats.invalidRows += 1;
-          window.hubLoadStats.missingNameRows += 1;
+          getState().loadStats.invalidRows += 1;
+          getState().loadStats.missingNameRows += 1;
           console.warn("Skipped hub row with missing name at row:", index + 2, rawHub);
           return;
         }
@@ -253,8 +208,8 @@ function loadHubData() {
         const lng = parseCoordinate(hub.lng);
 
         if (!isValidLatitude(lat) || !isValidLongitude(lng)) {
-          window.hubLoadStats.invalidRows += 1;
-          window.hubLoadStats.invalidCoordRows += 1;
+          getState().loadStats.invalidRows += 1;
+          getState().loadStats.invalidCoordRows += 1;
           console.warn(
             "Skipped hub row with invalid coordinates at row:",
             index + 2,
@@ -265,7 +220,7 @@ function loadHubData() {
 
         const duplicateKey = buildDuplicateKey(hub, lat, lng);
         if (duplicateTracker.has(duplicateKey)) {
-          window.hubLoadStats.duplicateRows += 1;
+          getState().loadStats.duplicateRows += 1;
           console.warn("Skipped duplicate hub row at row:", index + 2, hub);
           return;
         }
@@ -279,9 +234,9 @@ function loadHubData() {
         attachMarkerEvents(marker);
 
         markers.addLayer(marker);
-        hubMarkers.push(marker);
+        getState().hubMarkers.push(marker);
 
-        allHubs.push({
+        getState().allHubs.push({
           name: hub.name || "",
           police_station: hub.police_station || "",
           district: hub.district || "",
@@ -290,17 +245,17 @@ function loadHubData() {
           raw: hub
         });
 
-        window.hubLoadStats.validRows += 1;
+        getState().loadStats.validRows += 1;
       });
 
       if (results.errors && results.errors.length) {
-        window.hubLoadStats.parseErrors = results.errors.length;
+        getState().loadStats.parseErrors = results.errors.length;
         console.warn("Papa Parse errors:", results.errors);
       }
 
-      logLoadSummary(window.hubLoadStats);
+      logLoadSummary(getState().loadStats);
 
-      if (allHubs.length === 0) {
+      if (getState().allHubs.length === 0) {
         renderTrees();
         updateVisibleMarkers([]);
         showLoadError("No valid hub data found.");
@@ -309,13 +264,13 @@ function loadHubData() {
       }
 
       renderTrees();
-      updateVisibleMarkers(allHubs);
+      updateVisibleMarkers(getState().allHubs);
 
       if (typeof refreshHeatmapData === "function") {
         refreshHeatmapData();
       }
 
-      showLoadSummary(window.hubLoadStats);
+      showLoadSummary(getState().loadStats);
       hideLoadingScreen();
     },
     error: function(error) {
