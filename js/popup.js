@@ -184,13 +184,13 @@ function openWhatsappGroup(link) {
 
 function copyTextValue(value, label, triggerEl) {
   if (!value) {
-    showMapToast(`${label} not available.`);
+    showMapToast(label + " not available.");
     return;
   }
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(value).then(function() {
-      showMapToast(`${label} copied.`);
+      showMapToast(label + " copied.");
       showCopySuccess(triggerEl);
       highlightPhoneBox(triggerEl);
     }).catch(function() {
@@ -203,7 +203,7 @@ function copyTextValue(value, label, triggerEl) {
 }
 
 function copyCoordinates(lat, lng, triggerEl) {
-  copyTextValue(`${lat}, ${lng}`, "Coordinates", triggerEl);
+  copyTextValue(lat + ", " + lng, "Coordinates", triggerEl);
 }
 
 function fallbackCopy(value, label, triggerEl) {
@@ -214,11 +214,11 @@ function fallbackCopy(value, label, triggerEl) {
 
   try {
     document.execCommand("copy");
-    showMapToast(`${label} copied.`);
+    showMapToast(label + " copied.");
     showCopySuccess(triggerEl);
     highlightPhoneBox(triggerEl);
   } catch (e) {
-    showMapToast(`Could not copy ${label.toLowerCase()}.`);
+    showMapToast("Could not copy " + label.toLowerCase() + ".");
   }
 
   document.body.removeChild(temp);
