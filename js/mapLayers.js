@@ -1,7 +1,3 @@
-var mapLayerState = {
-  heatmapEnabled: false
-};
-
 function setHeatmapButtonState(isActive) {
   const btn = document.getElementById("heatmapToggleBtn");
   if (!btn) return;
@@ -10,16 +6,21 @@ function setHeatmapButtonState(isActive) {
 }
 
 function toggleHeatmapLayer() {
-  if (!mapLayerState.heatmapEnabled) {
+  if (!Array.isArray(getState().allHubs) || getState().allHubs.length === 0) {
+    showMapToast("No hub data is available.");
+    return;
+  }
+
+  if (!getState().mapLayerState.heatmapEnabled) {
     showHeatmap();
-    mapLayerState.heatmapEnabled = true;
+    getState().mapLayerState.heatmapEnabled = true;
     setHeatmapButtonState(true);
     showMapToast("Heatmap enabled.");
     return;
   }
 
   hideHeatmap();
-  mapLayerState.heatmapEnabled = false;
+  getState().mapLayerState.heatmapEnabled = false;
   setHeatmapButtonState(false);
   showMapToast("Heatmap disabled.");
 }
@@ -35,5 +36,5 @@ function initMapLayerControls() {
     });
   }
 
-  setHeatmapButtonState(false);
+  setHeatmapButtonState(!!getState().mapLayerState.heatmapEnabled);
 }
