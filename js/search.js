@@ -1,26 +1,50 @@
 var activeSuggestionIndex = -1;
 var currentSuggestions = [];
 
+function hasSearchableHubData() {
+  return Array.isArray(allHubs) && allHubs.length > 0;
+}
+
 function initSearch() {
   const searchBox = document.getElementById("searchBox");
   const suggestionsBox = document.getElementById("searchSuggestions");
+
   if (!searchBox || !suggestionsBox) return;
 
   searchBox.addEventListener("input", function() {
     const value = this.value.toLowerCase().trim();
+
+    if (!hasSearchableHubData()) {
+      currentSuggestions = [];
+      renderSearchSuggestions([], true);
+      return;
+    }
+
     const filtered = getFilteredHubs();
 
     updateVisibleMarkers(filtered);
     renderTrees();
-    fitMapToFilteredHubs(filtered);
 
     if (value === "") {
       hideSearchSuggestions();
+
+      if (filtered.length > 0) {
+        fitMapToFilteredHubs(filtered);
+      } else {
+        hideHubDetailsPanel();
+      }
+
       return;
     }
 
+    if (filtered.length > 0) {
+      fitMapToFilteredHubs(filtered);
+    } else {
+      hideHubDetailsPanel();
+    }
+
     currentSuggestions = allHubs
-      .filter(hub => {
+      .filter(function(hub) {
         const name = (hub.name || "").toLowerCase();
         const division = (hub.division || "").toLowerCase();
         const district = (hub.district || "").toLowerCase();
@@ -38,7 +62,7 @@ function initSearch() {
       })
       .slice(0, 8);
 
-    renderSearchSuggestions(currentSuggestions, value);
+    renderSearchSuggestions(currentSuggestions, false);
   });
 
   searchBox.addEventListener("keydown", function(e) {
@@ -46,7 +70,10 @@ function initSearch() {
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, currentSuggestions.length - 1);
+      activeSuggestionIndex = Math.min(
+        activeSuggestionIndex + 1,
+        currentSuggestions.length - 1
+      );
       updateSuggestionActiveState();
     }
 
@@ -75,20 +102,31 @@ function initSearch() {
   });
 }
 
-function renderSearchSuggestions(suggestions) {
+function renderSearchSuggestions(suggestions, noDataMode) {
   const suggestionsBox = document.getElementById("searchSuggestions");
   if (!suggestionsBox) return;
 
   suggestionsBox.innerHTML = "";
   activeSuggestionIndex = -1;
 
+  if (noDataMode) {
+    suggestionsBox.innerHTML =
+      '<div class="search-suggestion-item">' +
+        '<div class="search-suggestion-title">Hub data not ready</div>' +
+        '<div class="search-suggestion-meta">Please wait for data to load</div>' +
+      '</div>';
+
+    suggestionsBox.classList.remove("hidden");
+    return;
+  }
+
   if (!suggestions.length) {
-    suggestionsBox.innerHTML = `
-      <div class="search-suggestion-item">
-        <div class="search-suggestion-title">No results found</div>
-        <div class="search-suggestion-meta">Try hub, division, district or police station</div>
-      </div>
-    `;
+    suggestionsBox.innerHTML =
+      '<div class="search-suggestion-item">' +
+        '<div class="search-suggestion-title">No results found</div>' +
+        '<div class="search-suggestion-meta">Try hub, division, district or police station</div>' +
+      '</div>';
+
     suggestionsBox.classList.remove("hidden");
     return;
   }
@@ -96,10 +134,14 @@ function renderSearchSuggestions(suggestions) {
   suggestions.forEach(function(hub, index) {
     const item = document.createElement("div");
     item.className = "search-suggestion-item";
-    item.innerHTML = `
-      <div class="search-suggestion-title">${hub.name}</div>
-      <div class="search-suggestion-meta">${hub.district || "-"} • ${hub.division || "-"} • ${hub.police_station || "-"}</div>
-    `;
+
+    item.innerHTML =
+      '<div class="search-suggestion-title">' + escapeSearchText(hub.name || "") + "</div>" +
+      '<div class="search-suggestion-meta">' +
+        escapeSearchText(hub.district || "-") + " • " +
+        escapeSearchText(hub.division || "-") + " • " +
+        escapeSearchText(hub.police_station || "-") +
+      "</div>";
 
     item.addEventListener("click", function() {
       selectSearchSuggestion(hub);
@@ -118,6 +160,7 @@ function renderSearchSuggestions(suggestions) {
 
 function updateSuggestionActiveState() {
   const items = document.querySelectorAll(".search-suggestion-item");
+
   items.forEach(function(item, index) {
     item.classList.toggle("active", index === activeSuggestionIndex);
   });
@@ -137,14 +180,22 @@ function selectSearchSuggestion(hub) {
   const searchBox = document.getElementById("searchBox");
   if (!searchBox || !hub) return;
 
-  searchBox.value = hub.name;
+  searchBox.value = hub.name || "";
   hideSearchSuggestions();
 
   activeSelection.type = "hub";
-  activeSelection.value = hub.name;
+  activeSelection.value = hub.name || "";
 
   updateVisibleMarkers([hub]);
   renderTrees();
   focusHubOnMap(hub, 13);
   scrollToHubTreeItem(hub.name);
+}
+
+function escapeSearchText(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }

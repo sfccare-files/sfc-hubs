@@ -1,6 +1,7 @@
 var activeFilters = {
   division: [],
-  district: []
+  district: [],
+  police_station: []
 };
 
 var activeSelection = {
@@ -43,6 +44,10 @@ function matchesSearch(hub, searchValue) {
 }
 
 function getFilteredHubs() {
+  if (!Array.isArray(allHubs) || allHubs.length === 0) {
+    return [];
+  }
+
   const searchValue = getSearchValue();
 
   return allHubs.filter(function(hub) {
@@ -54,13 +59,26 @@ function getFilteredHubs() {
       activeFilters.district.length === 0 ||
       activeFilters.district.includes(hub.district);
 
+    const matchPoliceStation =
+      activeFilters.police_station.length === 0 ||
+      activeFilters.police_station.includes(hub.police_station);
+
     const matchSearch = matchesSearch(hub, searchValue);
 
-    return matchDivision && matchDistrict && matchSearch;
+    return matchDivision && matchDistrict && matchPoliceStation && matchSearch;
   });
 }
 
 function getCrossFilteredValues() {
+  if (!Array.isArray(allHubs) || allHubs.length === 0) {
+    return {
+      divisions: [],
+      districts: [],
+      policeStations: [],
+      hubs: []
+    };
+  }
+
   const searchValue = getSearchValue();
   const filtered = getFilteredHubs();
 
@@ -69,20 +87,44 @@ function getCrossFilteredValues() {
       activeFilters.division.length === 0 ||
       activeFilters.division.includes(hub.division);
 
-    return matchDivision && matchesSearch(hub, searchValue);
-  });
-
-  const districtScopedHubs = allHubs.filter(function(hub) {
     const matchDistrict =
       activeFilters.district.length === 0 ||
       activeFilters.district.includes(hub.district);
 
-    return matchDistrict && matchesSearch(hub, searchValue);
+    const matchPoliceStation =
+      activeFilters.police_station.length === 0 ||
+      activeFilters.police_station.includes(hub.police_station);
+
+    return matchDivision && matchDistrict && matchPoliceStation && matchesSearch(hub, searchValue);
+  });
+
+  const districtScopedHubs = allHubs.filter(function(hub) {
+    const matchDivision =
+      activeFilters.division.length === 0 ||
+      activeFilters.division.includes(hub.division);
+
+    const matchPoliceStation =
+      activeFilters.police_station.length === 0 ||
+      activeFilters.police_station.includes(hub.police_station);
+
+    return matchDivision && matchPoliceStation && matchesSearch(hub, searchValue);
+  });
+
+  const policeStationScopedHubs = allHubs.filter(function(hub) {
+    const matchDivision =
+      activeFilters.division.length === 0 ||
+      activeFilters.division.includes(hub.division);
+
+    const matchDistrict =
+      activeFilters.district.length === 0 ||
+      activeFilters.district.includes(hub.district);
+
+    return matchDivision && matchDistrict && matchesSearch(hub, searchValue);
   });
 
   const districts = [
     ...new Set(
-      divisionScopedHubs
+      districtScopedHubs
         .map(function(hub) {
           return hub.district;
         })
@@ -92,9 +134,19 @@ function getCrossFilteredValues() {
 
   const divisions = [
     ...new Set(
-      districtScopedHubs
+      divisionScopedHubs
         .map(function(hub) {
           return hub.division;
+        })
+        .filter(Boolean)
+    )
+  ].sort();
+
+  const policeStations = [
+    ...new Set(
+      policeStationScopedHubs
+        .map(function(hub) {
+          return hub.police_station;
         })
         .filter(Boolean)
     )
@@ -103,6 +155,7 @@ function getCrossFilteredValues() {
   return {
     divisions: divisions,
     districts: districts,
+    policeStations: policeStations,
     hubs: filtered.slice().sort(function(a, b) {
       return (a.name || "").localeCompare(b.name || "");
     })
@@ -124,6 +177,8 @@ function applyFilters() {
 
 function toggleArrayFilter(filterKey, value) {
   const list = activeFilters[filterKey];
+  if (!Array.isArray(list)) return;
+
   const index = list.indexOf(value);
 
   if (index >= 0) {
@@ -134,6 +189,12 @@ function toggleArrayFilter(filterKey, value) {
 }
 
 function removeInvalidDependentFilters() {
+  if (!Array.isArray(allHubs) || allHubs.length === 0) {
+    activeFilters.district = [];
+    activeFilters.police_station = [];
+    return;
+  }
+
   const searchValue = getSearchValue();
 
   const validDistricts = new Set(
@@ -143,7 +204,11 @@ function removeInvalidDependentFilters() {
           activeFilters.division.length === 0 ||
           activeFilters.division.includes(hub.division);
 
-        return matchDivision && matchesSearch(hub, searchValue);
+        const matchPoliceStation =
+          activeFilters.police_station.length === 0 ||
+          activeFilters.police_station.includes(hub.police_station);
+
+        return matchDivision && matchPoliceStation && matchesSearch(hub, searchValue);
       })
       .map(function(hub) {
         return hub.district;
@@ -151,8 +216,31 @@ function removeInvalidDependentFilters() {
       .filter(Boolean)
   );
 
+  const validPoliceStations = new Set(
+    allHubs
+      .filter(function(hub) {
+        const matchDivision =
+          activeFilters.division.length === 0 ||
+          activeFilters.division.includes(hub.division);
+
+        const matchDistrict =
+          activeFilters.district.length === 0 ||
+          activeFilters.district.includes(hub.district);
+
+        return matchDivision && matchDistrict && matchesSearch(hub, searchValue);
+      })
+      .map(function(hub) {
+        return hub.police_station;
+      })
+      .filter(Boolean)
+  );
+
   activeFilters.district = activeFilters.district.filter(function(district) {
     return validDistricts.has(district);
+  });
+
+  activeFilters.police_station = activeFilters.police_station.filter(function(policeStation) {
+    return validPoliceStations.has(policeStation);
   });
 }
 
@@ -165,6 +253,14 @@ function setDivisionFilter(value) {
 
 function setDistrictFilter(value) {
   toggleArrayFilter("district", value);
+  removeInvalidDependentFilters();
+  clearActiveSelection("hub");
+  applyFilters();
+}
+
+function setPoliceStationFilter(value) {
+  toggleArrayFilter("police_station", value);
+  removeInvalidDependentFilters();
   clearActiveSelection("hub");
   applyFilters();
 }
@@ -172,6 +268,7 @@ function setDistrictFilter(value) {
 function clearAllFilters() {
   activeFilters.division = [];
   activeFilters.district = [];
+  activeFilters.police_station = [];
 
   activeSelection.type = "";
   activeSelection.value = "";
@@ -183,9 +280,16 @@ function clearAllFilters() {
 
   hideSearchSuggestions();
   hideHubDetailsPanel();
-  updateVisibleMarkers(allHubs);
-  renderTrees();
-  fitMapToFilteredHubs(allHubs);
+
+  if (Array.isArray(allHubs) && allHubs.length > 0) {
+    updateVisibleMarkers(allHubs);
+    renderTrees();
+    fitMapToFilteredHubs(allHubs);
+  } else {
+    updateVisibleMarkers([]);
+    renderTrees();
+  }
+
   resetAllSections();
 }
 

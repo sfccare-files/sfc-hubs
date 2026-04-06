@@ -23,7 +23,7 @@
       </div>
       <div class="header-time" id="liveDateTime">Loading time...</div>
       <div class="header-search">
-        <input id="searchBox" type="text" placeholder="Search Hub" autocomplete="off">
+        <input id="searchBox" type="text" placeholder="Search Hub / Division / District / Police Station" autocomplete="off">
         <span class="search-icon">⌕</span>
         <div id="searchSuggestions" class="search-suggestions hidden"></div>
       </div>
@@ -56,6 +56,11 @@
           <button class="rail-btn" data-rail-target="districtTree" title="Districts">
             <img src="assets/images/district.png" class="rail-icon">
             <span class="rail-badge" id="districtRailCount">0</span>
+          </button>
+
+          <button class="rail-btn" data-rail-target="policeStationTree" title="Police Stations">
+            <img src="assets/images/zone.png" class="rail-icon">
+            <span class="rail-badge" id="policeStationRailCount">0</span>
           </button>
 
           <button class="rail-btn" data-rail-target="hubTree" title="Hubs">
@@ -135,6 +140,14 @@
                     <span class="tree-box-count" id="districtTreeCount">0</span>
                   </button>
                   <div id="districtTree" class="tree-list hidden"></div>
+                </div>
+
+                <div class="tree-section">
+                  <button class="tree-toggle tree-box" data-target="policeStationTree">
+                    <span class="tree-box-label">Police Stations</span>
+                    <span class="tree-box-count" id="policeStationTreeCount">0</span>
+                  </button>
+                  <div id="policeStationTree" class="tree-list hidden"></div>
                 </div>
 
                 <div class="tree-section">

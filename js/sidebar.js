@@ -1,11 +1,30 @@
-let recentHubs = JSON.parse(localStorage.getItem("sfc_recent_hubs") || "[]");
-let favoriteHubs = JSON.parse(localStorage.getItem("sfc_favorite_hubs") || "[]");
+function safeReadStoredList(key) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn("Failed to parse localStorage list for key:", key, error);
+    return [];
+  }
+}
+
+let recentHubs = safeReadStoredList("sfc_recent_hubs");
+let favoriteHubs = safeReadStoredList("sfc_favorite_hubs");
+
+function saveStoredList(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.warn("Failed to write localStorage list for key:", key, error);
+  }
+}
 
 function renderTrees() {
   const data = getCrossFilteredValues();
 
   renderClickableTree("divisionTree", data.divisions, setDivisionFilter, "division");
   renderClickableTree("districtTree", data.districts, setDistrictFilter, "district");
+  renderClickableTree("policeStationTree", data.policeStations, setPoliceStationFilter, "police_station");
   renderHubTree(data.hubs);
 
   updateSidebarCounts(data);
@@ -18,16 +37,21 @@ function renderHubTree(hubs) {
 
   hubTree.innerHTML = "";
 
-  if (hubs.length === 0) {
-    hubTree.innerHTML = `
-      <div class="tree-item empty-tree">
-        No hubs found.<br>Try hub, division, district or police station.
-      </div>
-    `;
+  if (!Array.isArray(allHubs) || allHubs.length === 0) {
+    hubTree.innerHTML =
+      '<div class="tree-item empty-tree">Hub data is not available yet.</div>';
     return;
   }
 
-  hubs.forEach(hub => {
+  if (!hubs.length) {
+    hubTree.innerHTML =
+      '<div class="tree-item empty-tree">' +
+        'No hubs found.<br>Try hub, division, district or police station.' +
+      "</div>";
+    return;
+  }
+
+  hubs.forEach(function(hub) {
     const item = document.createElement("div");
     item.className = "tree-item";
     item.dataset.hubName = hub.name;
@@ -63,29 +87,38 @@ function renderClickableTree(containerId, items, clickHandler, type) {
 
   container.innerHTML = "";
 
-  if (items.length === 0) {
-    container.innerHTML = `<div class="tree-item empty-tree">No data</div>`;
+  if (!Array.isArray(allHubs) || allHubs.length === 0) {
+    container.innerHTML = '<div class="tree-item empty-tree">No data</div>';
     return;
   }
 
-  items.forEach(item => {
+  if (items.length === 0) {
+    container.innerHTML = '<div class="tree-item empty-tree">No data</div>';
+    return;
+  }
+
+  items.forEach(function(itemValue) {
     const row = document.createElement("div");
     row.className = "tree-item";
 
     const link = document.createElement("span");
     link.className = "tree-link";
-    link.textContent = item;
+    link.textContent = itemValue;
 
-    if (type === "division" && activeFilters.division.includes(item)) {
+    if (type === "division" && activeFilters.division.includes(itemValue)) {
       link.classList.add("active-item");
     }
 
-    if (type === "district" && activeFilters.district.includes(item)) {
+    if (type === "district" && activeFilters.district.includes(itemValue)) {
+      link.classList.add("active-item");
+    }
+
+    if (type === "police_station" && activeFilters.police_station.includes(itemValue)) {
       link.classList.add("active-item");
     }
 
     link.addEventListener("click", function() {
-      clickHandler(item);
+      clickHandler(itemValue);
     });
 
     row.appendChild(link);
@@ -94,19 +127,23 @@ function renderClickableTree(containerId, items, clickHandler, type) {
 }
 
 function addRecentHub(hub) {
-  recentHubs = recentHubs.filter(h => h.name !== hub.name);
+  if (!hub || !hub.name) return;
+
+  recentHubs = recentHubs.filter(function(item) {
+    return item.name !== hub.name;
+  });
 
   recentHubs.unshift({
     name: hub.name,
-    district: hub.district,
-    police_station: hub.police_station
+    district: hub.district || "",
+    police_station: hub.police_station || ""
   });
 
   if (recentHubs.length > 5) {
     recentHubs.pop();
   }
 
-  localStorage.setItem("sfc_recent_hubs", JSON.stringify(recentHubs));
+  saveStoredList("sfc_recent_hubs", recentHubs);
 }
 
 function isFavoriteHub(hubName) {
@@ -116,19 +153,23 @@ function isFavoriteHub(hubName) {
 }
 
 function toggleFavoriteHub(hub) {
-  const index = favoriteHubs.findIndex(h => h.name === hub.name);
+  if (!hub || !hub.name) return;
+
+  const index = favoriteHubs.findIndex(function(item) {
+    return item.name === hub.name;
+  });
 
   if (index > -1) {
     favoriteHubs.splice(index, 1);
   } else {
     favoriteHubs.unshift({
       name: hub.name,
-      district: hub.district,
-      police_station: hub.police_station
+      district: hub.district || "",
+      police_station: hub.police_station || ""
     });
   }
 
-  localStorage.setItem("sfc_favorite_hubs", JSON.stringify(favoriteHubs));
+  saveStoredList("sfc_favorite_hubs", favoriteHubs);
   updateQuickAccessPreview();
 
   if (activeSelection.type === "hub" && activeSelection.value === hub.name) {
@@ -143,21 +184,30 @@ function renderFavoritesList() {
   favoriteList.innerHTML = "";
 
   if (favoriteHubs.length === 0) {
-    favoriteList.innerHTML = `<div class="quick-empty">No favorite hubs yet</div>`;
+    favoriteList.innerHTML = '<div class="quick-empty">No favorite hubs yet</div>';
     return;
   }
 
-  favoriteHubs.forEach(hub => {
+  favoriteHubs.forEach(function(hub) {
     const item = document.createElement("div");
     item.className = "quick-list-item";
-    item.innerHTML = `
-      <div class="quick-list-item-name">${hub.name}</div>
-      <div class="quick-list-item-meta">${hub.district || ""}</div>
-    `;
+    item.innerHTML =
+      '<div class="quick-list-item-name">' + escapeSidebarText(hub.name || "") + "</div>" +
+      '<div class="quick-list-item-meta">' +
+        escapeSidebarText(hub.district || "") +
+        (hub.police_station ? " • " + escapeSidebarText(hub.police_station) : "") +
+      "</div>";
 
     item.addEventListener("click", function() {
-      const target = allHubs.find(h => h.name === hub.name);
-      if (!target) return;
+      const target = allHubs.find(function(h) {
+        return h.name === hub.name;
+      });
+
+      if (!target) {
+        showMapToast("This favorite hub is not available in current data.");
+        return;
+      }
+
       focusHubOnMap(target, 12);
     });
 
@@ -172,21 +222,30 @@ function renderRecentHubList() {
   recentList.innerHTML = "";
 
   if (recentHubs.length === 0) {
-    recentList.innerHTML = `<div class="quick-empty">No recent hubs yet</div>`;
+    recentList.innerHTML = '<div class="quick-empty">No recent hubs yet</div>';
     return;
   }
 
-  recentHubs.forEach(hub => {
+  recentHubs.forEach(function(hub) {
     const item = document.createElement("div");
     item.className = "quick-list-item";
-    item.innerHTML = `
-      <div class="quick-list-item-name">${hub.name}</div>
-      <div class="quick-list-item-meta">${hub.district || ""}</div>
-    `;
+    item.innerHTML =
+      '<div class="quick-list-item-name">' + escapeSidebarText(hub.name || "") + "</div>" +
+      '<div class="quick-list-item-meta">' +
+        escapeSidebarText(hub.district || "") +
+        (hub.police_station ? " • " + escapeSidebarText(hub.police_station) : "") +
+      "</div>";
 
     item.addEventListener("click", function() {
-      const target = allHubs.find(h => h.name === hub.name);
-      if (!target) return;
+      const target = allHubs.find(function(h) {
+        return h.name === hub.name;
+      });
+
+      if (!target) {
+        showMapToast("This recent hub is not available in current data.");
+        return;
+      }
+
       focusHubOnMap(target, 12);
     });
 
@@ -221,20 +280,24 @@ function updateQuickAccessPreview() {
 function updateSidebarCounts(data) {
   setCount("divisionTreeCount", data.divisions.length);
   setCount("districtTreeCount", data.districts.length);
+  setCount("policeStationTreeCount", data.policeStations.length);
   setCount("hubTreeCount", data.hubs.length);
 
   setCount("divisionRailCount", data.divisions.length);
   setCount("districtRailCount", data.districts.length);
+  setCount("policeStationRailCount", data.policeStations.length);
   setCount("hubRailCount", data.hubs.length);
 }
 
 function setCount(id, value) {
   const el = document.getElementById(id);
-  if (el) el.textContent = value;
+  if (el) {
+    el.textContent = value;
+  }
 }
 
 function initTreeToggles() {
-  document.querySelectorAll(".tree-toggle").forEach(toggle => {
+  document.querySelectorAll(".tree-toggle").forEach(function(toggle) {
     toggle.addEventListener("click", function() {
       const id = this.dataset.target;
       const el = document.getElementById(id);
@@ -247,7 +310,7 @@ function initTreeToggles() {
 }
 
 function initSidebarPanel() {
-  document.querySelectorAll(".sidebar-panel-toggle").forEach(toggle => {
+  document.querySelectorAll(".sidebar-panel-toggle").forEach(function(toggle) {
     toggle.addEventListener("click", function() {
       const targetId = this.getAttribute("data-panel-target");
       const target = document.getElementById(targetId);
@@ -279,10 +342,14 @@ function initSidebarCollapse() {
   btn.addEventListener("click", function() {
     sidebar.classList.toggle("collapsed");
 
-    localStorage.setItem(
-      "sfc_sidebar_collapsed",
-      sidebar.classList.contains("collapsed")
-    );
+    try {
+      localStorage.setItem(
+        "sfc_sidebar_collapsed",
+        sidebar.classList.contains("collapsed")
+      );
+    } catch (error) {
+      console.warn("Failed to persist sidebar state.", error);
+    }
 
     setTimeout(function() {
       if (typeof map !== "undefined") {
@@ -298,7 +365,7 @@ function initSidebarRail() {
 
   if (!sidebar || railButtons.length === 0) return;
 
-  railButtons.forEach(btn => {
+  railButtons.forEach(function(btn) {
     btn.addEventListener("click", function() {
       const action = this.getAttribute("data-rail-action");
       const target = this.getAttribute("data-rail-target");
@@ -313,7 +380,12 @@ function initSidebarRail() {
       if (!target) return;
 
       sidebar.classList.remove("collapsed");
-      localStorage.setItem("sfc_sidebar_collapsed", "false");
+
+      try {
+        localStorage.setItem("sfc_sidebar_collapsed", "false");
+      } catch (error) {
+        console.warn("Failed to persist sidebar rail state.", error);
+      }
 
       setTimeout(function() {
         const quickPanel = document.getElementById("quickAccessPanel");
@@ -342,7 +414,7 @@ function openSection(targetId) {
 
   target.classList.remove("hidden");
 
-  const toggle = document.querySelector(`.tree-toggle[data-target="${targetId}"]`);
+  const toggle = document.querySelector('.tree-toggle[data-target="' + targetId + '"]');
   if (toggle) {
     toggle.classList.add("active");
   }
@@ -354,7 +426,7 @@ function closeSection(targetId) {
 
   target.classList.add("hidden");
 
-  const toggle = document.querySelector(`.tree-toggle[data-target="${targetId}"]`);
+  const toggle = document.querySelector('.tree-toggle[data-target="' + targetId + '"]');
   if (toggle) {
     toggle.classList.remove("active");
   }
@@ -363,12 +435,14 @@ function closeSection(targetId) {
 function expandAllSections() {
   openSection("divisionTree");
   openSection("districtTree");
+  openSection("policeStationTree");
   openSection("hubTree");
 }
 
 function collapseAllSections() {
   closeSection("divisionTree");
   closeSection("districtTree");
+  closeSection("policeStationTree");
   closeSection("hubTree");
 }
 
@@ -395,12 +469,14 @@ function initFilterToolbar() {
 
 function scrollToHubTreeItem(name) {
   const hubTree = document.getElementById("hubTree");
-  if (!hubTree) return;
+  if (!hubTree || !name) return;
 
   openSection("hubTree");
 
-  setTimeout(() => {
-    const el = hubTree.querySelector(`[data-hub-name="${CSS.escape(name)}"]`);
+  setTimeout(function() {
+    if (!window.CSS || typeof window.CSS.escape !== "function") return;
+
+    const el = hubTree.querySelector('[data-hub-name="' + window.CSS.escape(name) + '"]');
 
     if (el) {
       el.scrollIntoView({
@@ -409,4 +485,12 @@ function scrollToHubTreeItem(name) {
       });
     }
   }, 100);
+}
+
+function escapeSidebarText(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
