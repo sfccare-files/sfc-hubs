@@ -4,6 +4,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
   const zonalManagerPhone = hub.phone || "";
   const teamLeader = hub.team_leader || "";
   const teamLeaderPhone = hub.team_leader_phone || "";
+  const whatsappGroup = hub.whatsapp_group || "";
 
   const preferredPhone =
     hub.hub_phone ||
@@ -125,6 +126,13 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
 
           <button
             class="secondary-action-btn"
+            onclick='openWhatsappGroup(${JSON.stringify(whatsappGroup)})'
+            ${whatsappGroup ? "" : "disabled"}>
+            💬 Whatsapp
+          </button>
+
+          <button
+            class="secondary-action-btn"
             onclick="copyCoordinates(${lat}, ${lng}, this)">
             🧭 Copy Coords
           </button>
@@ -156,6 +164,22 @@ function callPhone(phone) {
   }
 
   window.location.href = `tel:${phone}`;
+}
+
+function openWhatsappGroup(link) {
+  if (!link) {
+    showMapToast("Whatsapp group link not available.");
+    return;
+  }
+
+  const trimmedLink = String(link).trim();
+
+  if (!trimmedLink.startsWith("https://chat.whatsapp.com/")) {
+    showMapToast("Invalid Whatsapp group link.");
+    return;
+  }
+
+  window.open(trimmedLink, "_blank", "noopener,noreferrer");
 }
 
 function copyTextValue(value, label, triggerEl) {

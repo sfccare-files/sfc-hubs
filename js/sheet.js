@@ -58,7 +58,8 @@ function normalizeHubRow(row) {
     assistant_manager: normalized.assistant_manager || "",
     assistant_manager_phone: normalized.assistant_manager_phone || "",
     team_leader: normalized.team_leader || "",
-    team_leader_phone: normalized.team_leader_phone || ""
+    team_leader_phone: normalized.team_leader_phone || "",
+    whatsapp_group: normalized.whatsapp_group || ""
   };
 }
 
