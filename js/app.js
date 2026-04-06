@@ -17,9 +17,17 @@ function updateDateTime() {
   timeEl.textContent = now.toLocaleString("en-US", options);
 }
 
+function safeCall(fnName) {
+  if (typeof window[fnName] === "function") {
+    window[fnName]();
+    return true;
+  }
+  return false;
+}
+
 function initFreshHomeWhenReady() {
   let tries = 0;
-  const maxTries = 80;
+  const maxTries = 100;
 
   const timer = setInterval(function() {
     const hubsReady =
@@ -34,9 +42,17 @@ function initFreshHomeWhenReady() {
         renderTrees();
       }
 
-      updateVisibleMarkers(allHubs);
-      resetMapView();
-      resetAllSections();
+      if (typeof updateVisibleMarkers === "function") {
+        updateVisibleMarkers(allHubs);
+      }
+
+      if (typeof resetMapView === "function") {
+        resetMapView();
+      }
+
+      if (typeof resetAllSections === "function") {
+        resetAllSections();
+      }
 
       if (typeof updateQuickAccessPreview === "function") {
         updateQuickAccessPreview();
@@ -50,94 +66,135 @@ function initFreshHomeWhenReady() {
     }
 
     tries += 1;
+
     if (tries >= maxTries) {
       clearInterval(timer);
+
+      if (
+        typeof window.hubLoadStats !== "undefined" &&
+        window.hubLoadStats &&
+        window.hubLoadStats.validRows === 0
+      ) {
+        console.warn("Hub data did not become ready during startup.");
+      }
     }
   }, 150);
 }
 
-updateDateTime();
-setInterval(updateDateTime, 1000);
+function bindMapToolButton(id, handler) {
+  const btn = document.getElementById(id);
+  if (!btn || typeof handler !== "function") return;
 
-initTreeToggles();
-
-if (typeof initSidebarPanel === "function") {
-  initSidebarPanel();
-}
-
-if (typeof initSidebarCollapse === "function") {
-  initSidebarCollapse();
-}
-
-if (typeof initSidebarRail === "function") {
-  initSidebarRail();
-}
-
-if (typeof initFilterToolbar === "function") {
-  initFilterToolbar();
-}
-
-initSearch();
-initClearFilters();
-loadHubData();
-resetAllSections();
-
-if (typeof initMapLayerControls === "function") {
-  initMapLayerControls();
-}
-
-initFreshHomeWhenReady();
-
-const resetMapBtn = document.getElementById("resetMapBtn");
-if (resetMapBtn) {
-  resetMapBtn.addEventListener("click", function(e) {
+  btn.addEventListener("click", function(e) {
     e.preventDefault();
     e.stopPropagation();
-    resetMapView();
+    handler();
   });
 }
 
-const myLocationBtn = document.getElementById("myLocationBtn");
-if (myLocationBtn) {
-  myLocationBtn.addEventListener("click", function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    goToMyLocation();
+function initOverlayActions() {
+  document.addEventListener("click", function(e) {
+    const closeBtn = e.target.closest("#hubDetailsClose");
+    if (closeBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (typeof hideHubDetailsPanel === "function") {
+        hideHubDetailsPanel();
+      }
+      return;
+    }
+
+    const overlayEl = e.target.closest("#mapOverlay");
+    if (
+      overlayEl &&
+      !overlayEl.classList.contains("hidden") &&
+      typeof hideHubDetailsPanel === "function"
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      hideHubDetailsPanel();
+    }
   });
 }
 
-const nearestHubBtn = document.getElementById("nearestHubBtn");
-if (nearestHubBtn) {
-  nearestHubBtn.addEventListener("click", function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    goToNearestHub();
+function initResizeHandler() {
+  window.addEventListener("resize", function() {
+    if (typeof map !== "undefined" && map && typeof map.invalidateSize === "function") {
+      map.invalidateSize();
+    }
+
+    if (typeof hideMarkerHover === "function") {
+      hideMarkerHover();
+    }
   });
 }
 
-document.addEventListener("click", function(e) {
-  const closeBtn = e.target.closest("#hubDetailsClose");
-  if (closeBtn) {
-    e.preventDefault();
-    e.stopPropagation();
-    hideHubDetailsPanel();
+function bootApp() {
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+
+  safeCall("initTreeToggles");
+  safeCall("initSidebarPanel");
+  safeCall("initSidebarCollapse");
+  safeCall("initSidebarRail");
+  safeCall("initFilterToolbar");
+
+  if (typeof initSearch !== "function") {
+    console.error("Critical boot error: initSearch is not defined.");
+    if (typeof showLoadError === "function") {
+      showLoadError("App boot failed: search module missing.");
+    }
     return;
   }
 
-  const overlayEl = e.target.closest("#mapOverlay");
-  if (overlayEl && !overlayEl.classList.contains("hidden")) {
-    e.preventDefault();
-    e.stopPropagation();
-    hideHubDetailsPanel();
-  }
-});
-
-window.addEventListener("resize", function() {
-  if (typeof map !== "undefined") {
-    map.invalidateSize();
+  if (typeof initClearFilters !== "function") {
+    console.error("Critical boot error: initClearFilters is not defined.");
+    if (typeof showLoadError === "function") {
+      showLoadError("App boot failed: filter module missing.");
+    }
+    return;
   }
 
-  if (typeof hideMarkerHover === "function") {
-    hideMarkerHover();
+  if (typeof loadHubData !== "function") {
+    console.error("Critical boot error: loadHubData is not defined.");
+    if (typeof showLoadError === "function") {
+      showLoadError("App boot failed: data module missing.");
+    }
+    return;
   }
-});
+
+  initSearch();
+  initClearFilters();
+  loadHubData();
+
+  if (typeof resetAllSections === "function") {
+    resetAllSections();
+  }
+
+  safeCall("initMapLayerControls");
+  initFreshHomeWhenReady();
+
+  bindMapToolButton("resetMapBtn", function() {
+    if (typeof resetMapView === "function") {
+      resetMapView();
+    }
+  });
+
+  bindMapToolButton("myLocationBtn", function() {
+    if (typeof goToMyLocation === "function") {
+      goToMyLocation();
+    }
+  });
+
+  bindMapToolButton("nearestHubBtn", function() {
+    if (typeof goToNearestHub === "function") {
+      goToNearestHub();
+    }
+  });
+
+  initOverlayActions();
+  initResizeHandler();
+}
+
+bootApp();
