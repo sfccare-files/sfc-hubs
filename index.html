@@ -16,10 +16,18 @@
   <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-box">
+      <img src="assets/images/steadfast-logo.png" alt="Steadfast Logo" class="loading-logo">
+      <div class="loading-text">Loading hub data, please wait...</div>
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+
   <div class="app-shell">
     <div class="top-header">
       <div class="brand-wrap">
-        <img src="assets/images/steadfast-logo.png" class="brand-logo-img">
+        <img src="assets/images/steadfast-logo.png" class="brand-logo-img" alt="Steadfast Logo">
       </div>
       <div class="header-time" id="liveDateTime">Loading time...</div>
       <div class="header-search">
@@ -41,30 +49,30 @@
 
         <div class="sidebar-icon-rail">
           <button class="rail-btn" data-rail-action="clear" title="Clear Filters">
-            <img src="assets/images/clear-filter.png" class="rail-icon">
+            <img src="assets/images/clear-filter.png" class="rail-icon" alt="Clear Filters">
           </button>
 
           <button class="rail-btn" data-rail-target="quickAccessPanel" title="Quick Access">
-            <img src="assets/images/quick-access.png" class="rail-icon">
+            <img src="assets/images/quick-access.png" class="rail-icon" alt="Quick Access">
           </button>
 
           <button class="rail-btn" data-rail-target="divisionTree" title="Divisions">
-            <img src="assets/images/division.png" class="rail-icon">
+            <img src="assets/images/division.png" class="rail-icon" alt="Divisions">
             <span class="rail-badge" id="divisionRailCount">0</span>
           </button>
 
           <button class="rail-btn" data-rail-target="districtTree" title="Districts">
-            <img src="assets/images/district.png" class="rail-icon">
+            <img src="assets/images/district.png" class="rail-icon" alt="Districts">
             <span class="rail-badge" id="districtRailCount">0</span>
           </button>
 
           <button class="rail-btn" data-rail-target="policeStationTree" title="Police Stations">
-            <img src="assets/images/zone.png" class="rail-icon">
+            <img src="assets/images/zone.png" class="rail-icon" alt="Police Stations">
             <span class="rail-badge" id="policeStationRailCount">0</span>
           </button>
 
           <button class="rail-btn" data-rail-target="hubTree" title="Hubs">
-            <img src="assets/images/Hubs.png" class="rail-icon">
+            <img src="assets/images/Hubs.png" class="rail-icon" alt="Hubs">
             <span class="rail-badge" id="hubRailCount">0</span>
           </button>
         </div>
