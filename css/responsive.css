@@ -153,21 +153,6 @@
     right: 14px;
   }
 
-  .grid2{
-    grid-template-columns: 1fr;
-  }
-
-  .custom-popup .leaflet-popup-content{
-    width: auto !important;
-    max-width: calc(100vw - 24px) !important;
-  }
-
-  .hub-popup{
-    width: 100%;
-    max-width: calc(100vw - 24px);
-    padding: 0;
-  }
-
   .direction-btn{
     width: 100%;
   }
