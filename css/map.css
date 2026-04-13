@@ -59,6 +59,29 @@
   transform:translateY(-1px);
 }
 
+.map-tool-btn:active{
+  transform:translateY(0);
+}
+
+.map-tool-btn.active{
+  background:linear-gradient(135deg,#22c27a 0%,#169f64 100%);
+  color:#ffffff;
+  border-color:rgba(22,159,100,0.95);
+  box-shadow:0 12px 24px rgba(22,159,100,0.24);
+}
+
+.map-tool-btn:disabled{
+  opacity:0.45;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+
+.map-tool-btn:disabled:hover{
+  background:rgba(255,255,255,0.96);
+  transform:none;
+}
+
 .marker-hover-card{
   position:absolute;
   z-index:1050;
@@ -159,10 +182,15 @@
   cursor:pointer;
   z-index:9200;
   pointer-events:auto;
+  transition:all .18s ease;
 }
 
 .hub-details-close:hover{
   background:#e3e8eb;
+}
+
+.hub-details-close:active{
+  transform:scale(.96);
 }
 
 .marker-cluster-small,

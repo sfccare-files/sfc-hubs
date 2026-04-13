@@ -3,6 +3,8 @@ function setHeatmapButtonState(isActive) {
   if (!btn) return;
 
   btn.textContent = isActive ? "Heatmap On" : "Heatmap";
+  btn.classList.toggle("active", !!isActive);
+  btn.setAttribute("aria-pressed", isActive ? "true" : "false");
 }
 
 function toggleHeatmapLayer() {

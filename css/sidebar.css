@@ -73,6 +73,10 @@
   background: #e3e8eb;
 }
 
+.sidebar-toggle-btn:active{
+  transform: scale(0.97);
+}
+
 .sidebar-body{
   display: flex;
   flex-direction: column;
@@ -115,6 +119,20 @@
 
 .clear-filters-btn:hover{
   background: #e3e8eb;
+}
+
+.clear-filters-btn:active{
+  transform: scale(0.99);
+}
+
+.clear-filters-btn:disabled{
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.clear-filters-btn:disabled:hover{
+  background: #eef2f4;
 }
 
 .sidebar-scroll-area{
@@ -233,6 +251,11 @@
   color: #1f2937;
 }
 
+.filter-toolbar-btn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+}
+
 .quick-access-grid{
   display: grid;
   grid-template-columns: 1fr;
@@ -329,6 +352,7 @@
   color: #98a2b3;
   font-style: italic;
   padding: 3px 2px;
+  line-height: 1.4;
 }
 
 .tree-wrap{
@@ -458,6 +482,7 @@
 .empty-tree{
   color: #98a2b3;
   font-style: italic;
+  line-height: 1.4;
 }
 
 .sidebar-icon-rail{
@@ -496,6 +521,11 @@
 
 .rail-btn:active{
   transform: scale(0.97);
+}
+
+.rail-btn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
 }
 
 .rail-icon{
