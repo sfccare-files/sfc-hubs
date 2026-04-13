@@ -151,16 +151,32 @@ function getCrossFilteredValues() {
   };
 }
 
-function applyFilters() {
-  const filtered = getFilteredHubs();
-
+function renderFilterDrivenView(filtered) {
   updateVisibleMarkers(filtered);
   renderTrees();
 
-  if (filtered.length > 0) {
-    fitMapToFilteredHubs(filtered);
-  } else {
+  if (!Array.isArray(filtered) || filtered.length === 0) {
     hideHubDetailsPanel();
+  }
+
+  if (typeof syncOpenSectionsToState === "function") {
+    syncOpenSectionsToState();
+  }
+}
+
+function applyFilters(options) {
+  const settings = options || {};
+  const shouldFitMap = settings.fitMap === true;
+  const filtered = getFilteredHubs();
+
+  renderFilterDrivenView(filtered);
+
+  if (filtered.length === 0) {
+    return;
+  }
+
+  if (shouldFitMap) {
+    fitMapToFilteredHubs(filtered);
   }
 }
 
@@ -237,21 +253,21 @@ function setDivisionFilter(value) {
   toggleArrayFilter("division", value);
   removeInvalidDependentFilters();
   clearActiveSelection("hub");
-  applyFilters();
+  applyFilters({ fitMap: true });
 }
 
 function setDistrictFilter(value) {
   toggleArrayFilter("district", value);
   removeInvalidDependentFilters();
   clearActiveSelection("hub");
-  applyFilters();
+  applyFilters({ fitMap: true });
 }
 
 function setPoliceStationFilter(value) {
   toggleArrayFilter("police_station", value);
   removeInvalidDependentFilters();
   clearActiveSelection("hub");
-  applyFilters();
+  applyFilters({ fitMap: true });
 }
 
 function clearAllFilters() {
@@ -271,8 +287,7 @@ function clearAllFilters() {
   hideHubDetailsPanel();
 
   if (Array.isArray(getState().allHubs) && getState().allHubs.length > 0) {
-    updateVisibleMarkers(getState().allHubs);
-    renderTrees();
+    renderFilterDrivenView(getState().allHubs);
     fitMapToFilteredHubs(getState().allHubs);
   } else {
     updateVisibleMarkers([]);
