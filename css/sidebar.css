@@ -397,8 +397,8 @@
   width: 100%;
   background: #edf2f4;
   color: #475467;
-  padding: 6px 8px;
-  border-radius: 8px;
+  padding: 7px 9px;
+  border-radius: 9px;
   font-size: 10px;
   font-weight: 700;
   transition: all 0.2s ease;
@@ -440,7 +440,7 @@
 }
 
 .tree-list{
-  padding: 2px 0 0 0;
+  padding: 4px 0 0 0;
 }
 
 .tree-list.hidden{
@@ -452,7 +452,7 @@
   margin: 0;
   padding: 1px 3px 1px 8px;
   font-size: 9px;
-  line-height: 1.05;
+  line-height: 1.1;
   color: #667085;
   word-break: break-word;
 }
@@ -463,8 +463,8 @@
   cursor: pointer;
   color: #475467;
   text-decoration: none;
-  padding: 4px 5px;
-  border-radius: 5px;
+  padding: 6px 7px;
+  border-radius: 7px;
   transition: all 0.18s ease;
 }
 
@@ -477,6 +477,7 @@
   background: rgba(34, 194, 122, 0.16);
   color: #0f5c39;
   font-weight: 700;
+  box-shadow: inset 3px 0 0 #22c27a;
 }
 
 .empty-tree{

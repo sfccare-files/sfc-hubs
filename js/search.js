@@ -2,67 +2,116 @@ function hasSearchableHubData() {
   return Array.isArray(getState().allHubs) && getState().allHubs.length > 0;
 }
 
+function shouldSkipSearchMapFit(filtered, value) {
+  if (!value) return false;
+  if (!Array.isArray(filtered) || filtered.length === 0) return false;
+  if (filtered.length > 25) return true;
+
+  if (
+    getState().selection.type === "hub" &&
+    filtered.length === 1 &&
+    filtered[0].name === getState().selection.value
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function buildNoResultMessage() {
+  const searchValue = getSearchValue();
+  const hasSearch = !!searchValue;
+  const hasDivision = getState().filters.division.length > 0;
+  const hasDistrict = getState().filters.district.length > 0;
+  const hasPoliceStation = getState().filters.police_station.length > 0;
+
+  if (hasSearch || hasDivision || hasDistrict || hasPoliceStation) {
+    return "No matches found for current search/filter.";
+  }
+
+  return "No results found.";
+}
+
+function handleSearchInput() {
+  const searchBox = document.getElementById("searchBox");
+  if (!searchBox) return;
+
+  const value = searchBox.value.toLowerCase().trim();
+
+  if (!hasSearchableHubData()) {
+    getState().search.currentSuggestions = [];
+    renderSearchSuggestions([], true);
+    return;
+  }
+
+  const filtered = getFilteredHubs();
+
+  renderFilterDrivenView(filtered);
+
+  if (value === "") {
+    hideSearchSuggestions();
+
+    if (filtered.length === 0) {
+      hideHubDetailsPanel();
+    }
+
+    return;
+  }
+
+  if (filtered.length === 0) {
+    hideHubDetailsPanel();
+  } else if (!shouldSkipSearchMapFit(filtered, value)) {
+    fitMapToFilteredHubs(filtered);
+  }
+
+  getState().search.currentSuggestions = getState().allHubs
+    .filter(function(hub) {
+      const name = (hub.name || "").toLowerCase();
+      const division = (hub.division || "").toLowerCase();
+      const district = (hub.district || "").toLowerCase();
+      const policeStation = (hub.police_station || "").toLowerCase();
+
+      return (
+        name.includes(value) ||
+        division.includes(value) ||
+        district.includes(value) ||
+        policeStation.includes(value)
+      );
+    })
+    .sort(function(a, b) {
+      return (a.name || "").localeCompare(b.name || "");
+    })
+    .slice(0, getConfig().search.suggestionLimit);
+
+  renderSearchSuggestions(getState().search.currentSuggestions, false);
+}
+
 function initSearch() {
   const searchBox = document.getElementById("searchBox");
   const suggestionsBox = document.getElementById("searchSuggestions");
 
   if (!searchBox || !suggestionsBox) return;
 
-  const handleInput = debounce(function() {
+  const debouncedHandleInput = debounce(
+    handleSearchInput,
+    getConfig().search.debounceMs
+  );
+
+  searchBox.addEventListener("input", debouncedHandleInput);
+
+  searchBox.addEventListener("focus", function() {
     const value = searchBox.value.toLowerCase().trim();
 
+    if (!value) return;
     if (!hasSearchableHubData()) {
-      getState().search.currentSuggestions = [];
       renderSearchSuggestions([], true);
       return;
     }
 
-    const filtered = getFilteredHubs();
-
-    updateVisibleMarkers(filtered);
-    renderTrees();
-
-    if (value === "") {
-      hideSearchSuggestions();
-
-      if (filtered.length > 0) {
-        fitMapToFilteredHubs(filtered);
-      } else {
-        hideHubDetailsPanel();
-      }
-
-      return;
+    if (getState().search.currentSuggestions.length > 0) {
+      renderSearchSuggestions(getState().search.currentSuggestions, false);
     }
-
-    if (filtered.length > 0) {
-      fitMapToFilteredHubs(filtered);
-    } else {
-      hideHubDetailsPanel();
-    }
-
-    getState().search.currentSuggestions = getState().allHubs
-      .filter(function(hub) {
-        const name = (hub.name || "").toLowerCase();
-        const division = (hub.division || "").toLowerCase();
-        const district = (hub.district || "").toLowerCase();
-        const policeStation = (hub.police_station || "").toLowerCase();
-
-        return (
-          name.includes(value) ||
-          division.includes(value) ||
-          district.includes(value) ||
-          policeStation.includes(value)
-        );
-      })
-      .sort(function(a, b) {
-        return (a.name || "").localeCompare(b.name || "");
-      })
-      .slice(0, getConfig().search.suggestionLimit);
-
-    renderSearchSuggestions(getState().search.currentSuggestions, false);
-  }, getConfig().search.debounceMs);
-
-  searchBox.addEventListener("input", handleInput);
+  });
 
   searchBox.addEventListener("keydown", function(e) {
     if (getState().search.currentSuggestions.length === 0) return;
@@ -118,7 +167,7 @@ function renderSearchSuggestions(suggestions, noDataMode) {
 
   if (noDataMode) {
     suggestionsBox.innerHTML =
-      '<div class="search-suggestion-item">' +
+      '<div class="search-suggestion-item search-suggestion-static">' +
         '<div class="search-suggestion-title">Hub data not ready</div>' +
         '<div class="search-suggestion-meta">Please wait for data to load</div>' +
       '</div>';
@@ -129,9 +178,9 @@ function renderSearchSuggestions(suggestions, noDataMode) {
 
   if (!suggestions.length) {
     suggestionsBox.innerHTML =
-      '<div class="search-suggestion-item">' +
+      '<div class="search-suggestion-item search-suggestion-static">' +
         '<div class="search-suggestion-title">No results found</div>' +
-        '<div class="search-suggestion-meta">Try hub, division, district or police station</div>' +
+        '<div class="search-suggestion-meta">' + escapeHtmlText(buildNoResultMessage()) + '</div>' +
       '</div>';
 
     suggestionsBox.classList.remove("hidden");
@@ -141,6 +190,7 @@ function renderSearchSuggestions(suggestions, noDataMode) {
   suggestions.forEach(function(hub, index) {
     const item = document.createElement("div");
     item.className = "search-suggestion-item";
+    item.setAttribute("role", "option");
 
     item.innerHTML =
       '<div class="search-suggestion-title">' + escapeHtmlText(hub.name || "") + "</div>" +
@@ -159,6 +209,11 @@ function renderSearchSuggestions(suggestions, noDataMode) {
       updateSuggestionActiveState();
     });
 
+    item.addEventListener("touchstart", function() {
+      getState().search.activeSuggestionIndex = index;
+      updateSuggestionActiveState();
+    }, { passive: true });
+
     suggestionsBox.appendChild(item);
   });
 
@@ -166,7 +221,7 @@ function renderSearchSuggestions(suggestions, noDataMode) {
 }
 
 function updateSuggestionActiveState() {
-  const items = document.querySelectorAll(".search-suggestion-item");
+  const items = document.querySelectorAll(".search-suggestion-item:not(.search-suggestion-static)");
 
   items.forEach(function(item, index) {
     item.classList.toggle("active", index === getState().search.activeSuggestionIndex);

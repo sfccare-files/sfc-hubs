@@ -1,6 +1,38 @@
 getState().storage.recentHubs = safeReadStoredList("sfc_recent_hubs");
 getState().storage.favoriteHubs = safeReadStoredList("sfc_favorite_hubs");
 
+function renderSidebarCollectionsOnly() {
+  updateQuickAccessPreview();
+}
+
+function getHubTreeEmptyMessage() {
+  if (!Array.isArray(getState().allHubs) || getState().allHubs.length === 0) {
+    return "Hub data is not available yet.";
+  }
+
+  const hasSearch = !!getSearchValue();
+  const hasDivision = getState().filters.division.length > 0;
+  const hasDistrict = getState().filters.district.length > 0;
+  const hasPoliceStation = getState().filters.police_station.length > 0;
+
+  if (hasSearch || hasDivision || hasDistrict || hasPoliceStation) {
+    return "No hubs match your current search/filter.";
+  }
+
+  return "No hubs found.";
+}
+
+function buildSectionEmptyMessage(type) {
+  if (!Array.isArray(getState().allHubs) || getState().allHubs.length === 0) {
+    return "No data";
+  }
+
+  if (type === "division") return "No divisions match";
+  if (type === "district") return "No districts match";
+  if (type === "police_station") return "No police stations match";
+  return "No data";
+}
+
 function renderTrees() {
   const data = getCrossFilteredValues();
 
@@ -10,7 +42,7 @@ function renderTrees() {
   renderHubTree(data.hubs);
 
   updateSidebarCounts(data);
-  updateQuickAccessPreview();
+  renderSidebarCollectionsOnly();
 }
 
 function renderHubTree(hubs) {
@@ -28,7 +60,7 @@ function renderHubTree(hubs) {
   if (!hubs.length) {
     hubTree.innerHTML =
       '<div class="tree-item empty-tree">' +
-        'No hubs found.<br>Try hub, division, district or police station.' +
+        escapeHtmlText(getHubTreeEmptyMessage()) +
       "</div>";
     return;
   }
@@ -75,7 +107,10 @@ function renderClickableTree(containerId, items, clickHandler, type) {
   }
 
   if (items.length === 0) {
-    container.innerHTML = '<div class="tree-item empty-tree">No data</div>';
+    container.innerHTML =
+      '<div class="tree-item empty-tree">' +
+        escapeHtmlText(buildSectionEmptyMessage(type)) +
+      '</div>';
     return;
   }
 
@@ -108,6 +143,19 @@ function renderClickableTree(containerId, items, clickHandler, type) {
   });
 }
 
+function syncOpenSectionsToState() {
+  const hasDivision = getState().filters.division.length > 0;
+  const hasDistrict = getState().filters.district.length > 0;
+  const hasPoliceStation = getState().filters.police_station.length > 0;
+  const hasSelectedHub = getState().selection.type === "hub" && !!getState().selection.value;
+  const hasSearch = !!getSearchValue();
+
+  if (hasDivision) openSection("divisionTree");
+  if (hasDistrict) openSection("districtTree");
+  if (hasPoliceStation) openSection("policeStationTree");
+  if (hasSelectedHub || hasSearch) openSection("hubTree");
+}
+
 function addRecentHub(hub) {
   if (!hub || !hub.name) return;
 
@@ -126,6 +174,7 @@ function addRecentHub(hub) {
   }
 
   saveStoredList("sfc_recent_hubs", getState().storage.recentHubs);
+  renderSidebarCollectionsOnly();
 }
 
 function isFavoriteHub(hubName) {
@@ -152,7 +201,7 @@ function toggleFavoriteHub(hub) {
   }
 
   saveStoredList("sfc_favorite_hubs", getState().storage.favoriteHubs);
-  updateQuickAccessPreview();
+  renderSidebarCollectionsOnly();
 
   if (getState().selection.type === "hub" && getState().selection.value === hub.name) {
     showHubDetailsPanel(hub);
