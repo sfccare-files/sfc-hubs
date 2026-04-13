@@ -39,8 +39,8 @@
 .hub-popup-body{
   flex:1;
   min-height:0;
-  padding:16px;
-  padding-bottom:12px;
+  padding:18px;
+  padding-bottom:14px;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
 }
@@ -48,18 +48,18 @@
 .title{
   text-align:center;
   border-bottom:2px solid rgba(15,23,42,0.14);
-  padding-bottom:8px;
-  margin-bottom:12px;
+  padding-bottom:10px;
+  margin-bottom:16px;
   color:#1f2937;
   padding-right:76px;
 }
 
 .box{
   background:#e8edef;
-  padding:10px 12px;
-  border-radius:10px;
-  margin-bottom:8px;
-  font-size:13px;
+  padding:12px 14px;
+  border-radius:12px;
+  margin-bottom:10px;
+  font-size:14px;
   width:100%;
   box-sizing:border-box;
   word-break:break-word;
@@ -71,7 +71,7 @@
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:8px;
+  gap:10px;
 }
 
 .box-copy-text{
@@ -178,8 +178,9 @@
 .grid2{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:8px;
+  gap:12px;
   width:100%;
+  margin-bottom:10px;
 }
 
 .grid2 .box{
@@ -190,16 +191,16 @@
 .section{
   background:#d6dee2;
   text-align:center;
-  padding:8px 10px;
-  border-radius:10px;
-  margin:10px 0 8px;
+  padding:10px 12px;
+  border-radius:12px;
+  margin:14px 0 12px;
   font-weight:700;
   color:#1f2937;
 }
 
 .hub-popup-footer{
   flex-shrink:0;
-  padding:12px 16px 16px;
+  padding:14px 18px 18px;
   background:rgba(248,251,252,0.98);
   border-top:1px solid rgba(15,23,42,0.10);
 }
@@ -208,10 +209,10 @@
   width:100%;
   background:linear-gradient(135deg,#22c27a 0%,#169f64 100%);
   color:#fff;
-  padding:12px 18px;
-  font-size:14px;
+  padding:13px 18px;
+  font-size:15px;
   font-weight:700;
-  border-radius:10px;
+  border-radius:12px;
   border:none;
   cursor:pointer;
   transition:all .2s ease;
@@ -235,8 +236,8 @@
 .hub-popup-secondary-actions{
   display:grid;
   grid-template-columns:repeat(3, 1fr);
-  gap:8px;
-  margin-top:10px;
+  gap:10px;
+  margin-top:12px;
 }
 
 .secondary-action-btn{
@@ -244,10 +245,10 @@
   border:1px solid rgba(15,23,42,0.10);
   background:#eef2f4;
   color:#344054;
-  padding:10px 12px;
-  font-size:12px;
+  padding:11px 12px;
+  font-size:13px;
   font-weight:700;
-  border-radius:10px;
+  border-radius:12px;
   cursor:pointer;
   transition:all .18s ease;
 }
@@ -290,11 +291,10 @@
   background:transparent;
 }
 
-/* This is the important fix:
-   switch to single-column much earlier */
 @media (max-width:1200px){
   .grid2{
     grid-template-columns:1fr;
+    gap:12px;
   }
 
   .hub-popup-secondary-actions{
@@ -337,6 +337,11 @@
     padding:12px;
     font-size:15px;
     border-radius:14px;
+    margin-bottom:10px;
+  }
+
+  .grid2{
+    gap:10px;
     margin-bottom:10px;
   }
 
