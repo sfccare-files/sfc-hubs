@@ -37,11 +37,17 @@
   transform:scale(.96);
 }
 
+/* 🔥 UPGRADED SCROLL SYSTEM */
 .hub-popup-body{
   flex:1 1 auto;
   min-height:0;
+
   overflow-y:auto;
+  overflow-x:hidden;
+
   -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+
   padding:18px;
   padding-bottom:14px;
 }
@@ -200,11 +206,16 @@
   color:#1f2937;
 }
 
+/* 🔥 FOOTER NOW LOCKED */
 .hub-popup-footer{
   flex:0 0 auto;
   padding:14px 18px 18px;
   background:rgba(248,251,252,0.98);
   border-top:1px solid rgba(15,23,42,0.10);
+
+  position:sticky;
+  bottom:0;
+  z-index:5;
 }
 
 .direction-btn{
