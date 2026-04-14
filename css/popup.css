@@ -12,30 +12,35 @@
 .hub-popup-header {
   flex: 0 0 auto;
   display: flex;
-  align-items: center;
   justify-content: flex-end;
-  gap: 10px;
-  padding: 18px 18px;
-  min-height: 84px;
+  align-items: center;
+  padding: 14px 16px;
+  min-height: 72px;
   box-sizing: border-box;
 }
 
+.hub-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 999px;
+}
+
 .hub-icon-btn {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border: none;
   border-radius: 999px;
-  background: #eef2f4;
-  color: #344054;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  background: #eef2f4;
+  color: #344054;
+  font-size: 16px;
+  flex-shrink: 0;
   transition: all 0.18s ease;
-}
-
-.hub-favorite-btn {
-  font-size: 18px;
 }
 
 .hub-icon-btn:hover {
@@ -44,7 +49,11 @@
 }
 
 .hub-icon-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
+}
+
+.hub-favorite-btn {
+  font-size: 15px;
 }
 
 .hub-close-btn {
@@ -99,7 +108,6 @@
   padding-right: 80px;
 }
 
-
 .section {
   background: #d6dee2;
   text-align: center;
@@ -134,7 +142,6 @@
   flex: 1;
 }
 
-
 .inline-copy-btn {
   border: none;
   background: transparent;
@@ -165,7 +172,6 @@
   pointer-events: none;
   transition: transform 0.18s ease;
 }
-
 
 .copy-tooltip {
   position: absolute;
@@ -286,10 +292,6 @@
 }
 
 @media (max-width: 768px) {
-  .hub-popup {
-    height: 100vh;
-  }
-
   .box {
     font-size: 15px;
     border-radius: 14px;
