@@ -55,7 +55,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
       </button>
 
       <div class="hub-popup-body">
-        <h2 class="title">Hub Details</h2>
+        <h2 class="section-title">Hub Details</h2>
 
         <div class="box"><b>Name:</b> ${escapeHtmlText(hub.name || "")}</div>
         <div class="box"><b>Address:</b> ${escapeHtmlText(hub.address || "")}</div>
@@ -90,7 +90,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
 
         <hr>
 
-        <div class="section">Contact Details</div>
+        <div class="section-title">Contact Details</div>
 
         <div class="grid2">
           <div class="box"><b>Hub IP:</b> ${escapeHtmlText(hub.hub_ip || "")}</div>
