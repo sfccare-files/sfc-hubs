@@ -351,7 +351,14 @@
   }
 
   .hub-popup-body{
-    padding:16px 14px 10px;
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+  padding:18px;
+  padding-bottom:14px;
   }
 
   .title{
@@ -395,7 +402,13 @@
   }
 
   .hub-popup-footer{
-    padding:12px 14px 16px;
+  flex:0 0 auto;
+  position:sticky;
+  bottom:0;
+  z-index:5;
+  padding:14px 18px 18px;
+  background:rgba(248,251,252,0.98);
+  border-top:1px solid rgba(15,23,42,0.10);
   }
 
   .direction-btn{
