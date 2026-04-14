@@ -152,7 +152,7 @@
   width:min(760px, calc(100% - 32px));
   max-width:calc(100% - 32px);
 
-  height:min(92%, 820px);
+  height:auto;
   max-height:92%;
 
   display:flex;
