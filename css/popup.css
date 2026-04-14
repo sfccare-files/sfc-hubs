@@ -1,20 +1,28 @@
+
+/* =========================
+   ROOT POPUP SHELL
+========================= */
+
 .hub-popup {
-  width: 100%;
-  height: 100%;
+  height: 100vh;              /* defines scroll universe */
   display: flex;
   flex-direction: column;
+  overflow: hidden;           /* prevents scroll bleed */
   box-sizing: border-box;
-  background: transparent;
   position: relative;
-  min-height: 0;
-  overflow: hidden;
 }
+
+/* =========================
+   HEADER (NO SCROLL)
+========================= */
+
 .hub-popup-header {
   flex: 0 0 auto;
-  position: relative;
+
   display: flex;
-  align-items: center;
   justify-content: flex-end;
+  align-items: center;
+
   padding: 12px 14px;
   z-index: 10;
 }
@@ -22,16 +30,19 @@
 .hub-favorite-btn {
   width: 38px;
   height: 38px;
+
   border: none;
   border-radius: 999px;
+
   background: #eef2f4;
   color: #344054;
-  font-size: 18px;
-  cursor: pointer;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  font-size: 18px;
+  cursor: pointer;
 
   transition: all 0.18s ease;
 }
@@ -45,13 +56,13 @@
   transform: scale(0.96);
 }
 
-.hub-close-btn {
-  margin-left: 10px;
-}
+/* =========================
+   BODY (ONLY SCROLL AREA)
+========================= */
 
 .hub-popup-body {
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: 0;              /* CRITICAL FIX */
 
   overflow-y: auto;
   overflow-x: hidden;
@@ -62,6 +73,7 @@
   padding: 18px;
 }
 
+/* Scrollbar */
 .hub-popup-body::-webkit-scrollbar {
   width: 8px;
 }
@@ -75,6 +87,10 @@
   background: transparent;
 }
 
+/* =========================
+   TYPOGRAPHY / CONTENT
+========================= */
+
 .title {
   text-align: center;
   border-bottom: 2px solid rgba(15, 23, 42, 0.14);
@@ -84,13 +100,25 @@
   padding-right: 76px;
 }
 
+.section {
+  background: #d6dee2;
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  margin: 14px 0 12px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
 .box {
   background: #e8edef;
   padding: 12px 14px;
+
   border-radius: 12px;
   margin-bottom: 10px;
 
   font-size: 14px;
+
   width: 100%;
   box-sizing: border-box;
 
@@ -109,22 +137,16 @@
 
 .box-copy-text {
   flex: 1;
-  word-break: break-word;
-  overflow-wrap: anywhere;
 }
 
-.phone-copy-target {
-  cursor: pointer;
-}
-
-.phone-copy-target.phone-tap-active {
-  background: rgba(34, 194, 122, 0.16);
-  box-shadow: 0 0 0 2px rgba(34, 194, 122, 0.16) inset;
-}
+/* =========================
+   COPY BUTTON SYSTEM
+========================= */
 
 .inline-copy-btn {
   border: none;
   background: transparent;
+
   cursor: pointer;
 
   display: flex;
@@ -134,9 +156,8 @@
   padding: 4px;
   opacity: 0.6;
 
-  transition: all 0.18s ease;
   position: relative;
-  flex-shrink: 0;
+  transition: all 0.18s ease;
 }
 
 .inline-copy-btn:hover {
@@ -153,12 +174,11 @@
 .inline-copy-icon {
   width: 13px;
   height: 13px;
-  object-fit: contain;
-  display: block;
   pointer-events: none;
   transition: transform 0.18s ease;
 }
 
+/* Tooltip */
 .copy-tooltip {
   position: absolute;
   bottom: calc(100% + 6px);
@@ -173,24 +193,13 @@
 
   padding: 5px 7px;
   border-radius: 6px;
+
   white-space: nowrap;
 
   opacity: 0;
   pointer-events: none;
 
-  transition: opacity 0.18s ease, transform 0.18s ease;
-  z-index: 5;
-}
-
-.copy-tooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 4px;
-  border-style: solid;
-  border-color: rgba(15, 23, 42, 0.92) transparent transparent transparent;
+  transition: all 0.18s ease;
 }
 
 .inline-copy-btn:hover .copy-tooltip,
@@ -203,31 +212,28 @@
   transform: scale(1.15);
 }
 
+/* =========================
+   GRID SYSTEM
+========================= */
+
 .grid2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  width: 100%;
   margin-bottom: 10px;
 }
 
 .grid2 .box {
-  min-width: 0;
   margin-bottom: 0;
 }
 
-.section {
-  background: #d6dee2;
-  text-align: center;
-  padding: 10px 12px;
-  border-radius: 12px;
-  margin: 14px 0 12px;
-  font-weight: 700;
-  color: #1f2937;
-}
+/* =========================
+   FOOTER (ALWAYS VISIBLE)
+========================= */
 
 .hub-popup-footer {
   flex: 0 0 auto;
+
   padding: 14px 18px;
 
   background: rgba(248, 251, 252, 0.98);
@@ -238,15 +244,18 @@
 
 .direction-btn {
   width: 100%;
+
   background: linear-gradient(135deg, #22c27a 0%, #169f64 100%);
   color: #fff;
 
   padding: 13px 18px;
+
   font-size: 15px;
   font-weight: 700;
 
-  border-radius: 12px;
   border: none;
+  border-radius: 12px;
+
   cursor: pointer;
 
   transition: all 0.2s ease;
@@ -267,23 +276,28 @@
   filter: grayscale(0.15);
 }
 
+/* Secondary actions */
 .hub-popup-secondary-actions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+
   margin-top: 12px;
 }
 
 .secondary-action-btn {
   border: 1px solid rgba(15, 23, 42, 0.1);
   background: #eef2f4;
+
   color: #344054;
 
   padding: 11px 12px;
+
   font-size: 13px;
   font-weight: 700;
 
   border-radius: 12px;
+
   cursor: pointer;
 
   transition: all 0.18s ease;
@@ -297,11 +311,12 @@
 .secondary-action-btn:disabled {
   opacity: 0.42;
   cursor: not-allowed;
-  background: #eef2f4;
-  color: #98a2b3;
-  border-color: rgba(15, 23, 42, 0.06);
   transform: none;
 }
+
+/* =========================
+   RESPONSIVE (ONLY DENSITY)
+========================= */
 
 @media (max-width: 900px) {
   .hub-popup-body {
@@ -319,7 +334,7 @@
 
 @media (max-width: 768px) {
   .hub-popup {
-    max-height: 84vh;
+    height: 100vh;
   }
 
   .title {
