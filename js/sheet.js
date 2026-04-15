@@ -32,8 +32,11 @@ function showLoadError(message) {
 
   const hubTree = document.getElementById("hubTree");
   if (hubTree) {
-    hubTree.innerHTML =
-      '<div class="tree-item empty-tree">' + finalMessage + "</div>";
+    hubTree.innerHTML = "";
+    const emptyItem = document.createElement("div");
+    emptyItem.className = "tree-item empty-tree";
+    emptyItem.textContent = finalMessage;
+    hubTree.appendChild(emptyItem);
   }
 
   if (typeof showMapToast === "function") {

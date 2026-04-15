@@ -165,24 +165,35 @@ function renderSearchSuggestions(suggestions, noDataMode) {
   suggestionsBox.innerHTML = "";
   getState().search.activeSuggestionIndex = -1;
 
-  if (noDataMode) {
-    suggestionsBox.innerHTML =
-      '<div class="search-suggestion-item search-suggestion-static">' +
-        '<div class="search-suggestion-title">Hub data not ready</div>' +
-        '<div class="search-suggestion-meta">Please wait for data to load</div>' +
-      '</div>';
+  function createSuggestionCard(titleText, metaText) {
+    const item = document.createElement("div");
+    item.className = "search-suggestion-item search-suggestion-static";
 
+    const title = document.createElement("div");
+    title.className = "search-suggestion-title";
+    title.textContent = titleText;
+
+    const meta = document.createElement("div");
+    meta.className = "search-suggestion-meta";
+    meta.textContent = metaText;
+
+    item.appendChild(title);
+    item.appendChild(meta);
+    return item;
+  }
+
+  if (noDataMode) {
+    suggestionsBox.appendChild(
+      createSuggestionCard("Hub data not ready", "Please wait for data to load")
+    );
     suggestionsBox.classList.remove("hidden");
     return;
   }
 
   if (!suggestions.length) {
-    suggestionsBox.innerHTML =
-      '<div class="search-suggestion-item search-suggestion-static">' +
-        '<div class="search-suggestion-title">No results found</div>' +
-        '<div class="search-suggestion-meta">' + escapeHtmlText(buildNoResultMessage()) + '</div>' +
-      '</div>';
-
+    suggestionsBox.appendChild(
+      createSuggestionCard("No results found", buildNoResultMessage())
+    );
     suggestionsBox.classList.remove("hidden");
     return;
   }
@@ -192,13 +203,19 @@ function renderSearchSuggestions(suggestions, noDataMode) {
     item.className = "search-suggestion-item";
     item.setAttribute("role", "option");
 
-    item.innerHTML =
-      '<div class="search-suggestion-title">' + escapeHtmlText(hub.name || "") + "</div>" +
-      '<div class="search-suggestion-meta">' +
-        escapeHtmlText(hub.district || "-") + " • " +
-        escapeHtmlText(hub.division || "-") + " • " +
-        escapeHtmlText(hub.police_station || "-") +
-      "</div>";
+    const title = document.createElement("div");
+    title.className = "search-suggestion-title";
+    title.textContent = hub.name || "";
+
+    const meta = document.createElement("div");
+    meta.className = "search-suggestion-meta";
+    meta.textContent =
+      (hub.district || "-") + " • " +
+      (hub.division || "-") + " • " +
+      (hub.police_station || "");
+
+    item.appendChild(title);
+    item.appendChild(meta);
 
     item.addEventListener("click", function() {
       selectSearchSuggestion(hub);

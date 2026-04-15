@@ -34,11 +34,14 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
     const safeValue = value || "";
 
     return `
-      <div class="box box-copy phone-copy-target" data-phone-value="${escapeHtmlAttr(safeValue)}">
+      <div class="box box-copy phone-copy-target">
         <div class="box-copy-text"><b>${label}:</b> ${escapeHtmlText(safeValue)}</div>
         <button
+          type="button"
           class="inline-copy-btn"
-          onclick='copyTextValue(${JSON.stringify(safeValue)}, ${JSON.stringify(label)}, this)'
+          data-action="copy-text"
+          data-copy-value="${escapeHtmlAttr(safeValue)}"
+          data-copy-label="${escapeHtmlAttr(label)}"
           ${safeValue ? "" : "disabled"}>
           ${copyIcon(label)}
         </button>
@@ -57,15 +60,18 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
 
         <div class="hub-header-actions">
           <button
+            type="button"
             class="hub-icon-btn"
-            onclick='toggleFavoriteFromPopup(${JSON.stringify(hub.name)})'
+            data-action="toggle-favorite"
+            data-hub-name="${escapeHtmlAttr(hub.name || "")}" 
             title="Favorite">
             ${favoriteIcon}
           </button>
 
           <button
+            type="button"
             class="hub-icon-btn hub-close-btn"
-            onclick="closeHubPopup()"
+            data-action="close-popup"
             title="Close">
             ×
           </button>
@@ -100,8 +106,11 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
         <div class="box box-copy">
           <div class="box-copy-text"><b>Coordinates:</b> ${lat}, ${lng}</div>
           <button
+            type="button"
             class="inline-copy-btn"
-            onclick="copyCoordinates(${lat}, ${lng}, this)">
+            data-action="copy-coordinates"
+            data-lat="${escapeHtmlAttr(String(lat))}"
+            data-lng="${escapeHtmlAttr(String(lng))}">
             ${copyIcon("Coordinates")}
           </button>
         </div>
@@ -138,28 +147,38 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
         <div class="hub-popup-secondary-actions">
 
           <button
+            type="button"
             class="secondary-action-btn"
-            onclick="openDirections(${lat},${lng})">
+            data-action="open-directions"
+            data-lat="${escapeHtmlAttr(String(lat))}"
+            data-lng="${escapeHtmlAttr(String(lng))}">
             📍 Directions
           </button>
 
           <button
+            type="button"
             class="secondary-action-btn"
-            onclick='callPhone(${JSON.stringify(preferredPhone)})'
+            data-action="call-phone"
+            data-phone="${escapeHtmlAttr(preferredPhone)}"
             ${isCallablePhone(preferredPhone) ? "" : "disabled"}>
             📞 Call
           </button>
 
           <button
+            type="button"
             class="secondary-action-btn"
-            onclick='openWhatsappGroup(${JSON.stringify(whatsappGroup)})'
+            data-action="open-whatsapp"
+            data-whatsapp="${escapeHtmlAttr(whatsappGroup)}"
             ${isValidWhatsappGroupLink(whatsappGroup) ? "" : "disabled"}>
             💬 WhatsApp
           </button>
 
           <button
+            type="button"
             class="secondary-action-btn"
-            onclick="copyCoordinates(${lat}, ${lng}, this)">
+            data-action="copy-coordinates"
+            data-lat="${escapeHtmlAttr(String(lat))}"
+            data-lng="${escapeHtmlAttr(String(lng))}">
             🧭 Copy Coords
           </button>
 
@@ -196,6 +215,44 @@ function closeHubPopup() {
 
   if (panel) panel.classList.add("hidden");
   if (overlay) overlay.classList.add("hidden");
+}
+
+function initPopupActions() {
+  const popupPanel = document.getElementById("hubDetailsPanel");
+  if (!popupPanel) return;
+
+  popupPanel.addEventListener("click", function(event) {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+    event.preventDefault();
+
+    const action = button.dataset.action;
+    switch (action) {
+      case "close-popup":
+        closeHubPopup();
+        break;
+      case "toggle-favorite":
+        toggleFavoriteFromPopup(button.dataset.hubName);
+        break;
+      case "copy-text":
+        copyTextValue(button.dataset.copyValue, button.dataset.copyLabel, button);
+        break;
+      case "copy-coordinates":
+        copyTextValue(button.dataset.lat + ", " + button.dataset.lng, "Coordinates", button);
+        break;
+      case "open-directions":
+        openDirections(parseFloat(button.dataset.lat), parseFloat(button.dataset.lng));
+        break;
+      case "call-phone":
+        callPhone(button.dataset.phone);
+        break;
+      case "open-whatsapp":
+        openWhatsappGroup(button.dataset.whatsapp);
+        break;
+      default:
+        break;
+    }
+  });
 }
 
 /* =========================

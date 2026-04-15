@@ -188,6 +188,9 @@ function bootApp() {
   });
 
   initOverlayActions();
+  if (typeof initPopupActions === "function") {
+    initPopupActions();
+  }
   initResizeHandler();
 }
 
