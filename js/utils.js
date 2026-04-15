@@ -8,10 +8,24 @@ function getState() {
 
 function safeReadStoredList(key) {
   try {
-    const parsed = JSON.parse(localStorage.getItem(key) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
+    const rawValue = localStorage.getItem(key);
+    if (!rawValue) {
+      return [];
+    }
+
+    const parsed = JSON.parse(rawValue);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed;
   } catch (error) {
     console.warn("Failed to parse localStorage list for key:", key, error);
+    try {
+      localStorage.removeItem(key);
+    } catch (_) {
+      // Ignore cleanup errors.
+    }
     return [];
   }
 }
