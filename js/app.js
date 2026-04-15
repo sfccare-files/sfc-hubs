@@ -36,12 +36,29 @@ function initFreshHomeWhenReady() {
     if (hubsReady) {
       clearInterval(timer);
 
-      if (typeof renderTrees === "function") renderTrees();
-      if (typeof updateVisibleMarkers === "function") updateVisibleMarkers(getState().allHubs);
-      if (typeof resetMapView === "function") resetMapView();
-      if (typeof resetAllSections === "function") resetAllSections();
-      if (typeof updateQuickAccessPreview === "function") updateQuickAccessPreview();
-      if (typeof refreshHeatmapData === "function") refreshHeatmapData();
+      if (typeof renderTrees === "function") {
+        renderTrees();
+      }
+
+      if (typeof updateVisibleMarkers === "function") {
+        updateVisibleMarkers(getState().allHubs);
+      }
+
+      if (typeof resetMapView === "function") {
+        resetMapView();
+      }
+
+      if (typeof resetAllSections === "function") {
+        resetAllSections();
+      }
+
+      if (typeof updateQuickAccessPreview === "function") {
+        updateQuickAccessPreview();
+      }
+
+      if (typeof refreshHeatmapData === "function") {
+        refreshHeatmapData();
+      }
 
       return;
     }
@@ -83,20 +100,21 @@ function initOverlayActions() {
     }
 
     const overlayEl = e.target.closest("#mapOverlay");
-    if (overlayEl && !overlayEl.classList.contains("hidden")) {
+    if (
+      overlayEl &&
+      !overlayEl.classList.contains("hidden") &&
+      typeof hideHubDetailsPanel === "function"
+    ) {
       e.preventDefault();
       e.stopPropagation();
-
-      if (typeof hideHubDetailsPanel === "function") {
-        hideHubDetailsPanel();
-      }
+      hideHubDetailsPanel();
     }
   });
 }
 
 function initResizeHandler() {
   window.addEventListener("resize", function() {
-    if (typeof map !== "undefined" && map && map.invalidateSize) {
+    if (typeof map !== "undefined" && map && typeof map.invalidateSize === "function") {
       map.invalidateSize();
     }
 
@@ -105,41 +123,6 @@ function initResizeHandler() {
     }
   });
 }
-
-/* =========================
-   🔥 FIX: RELIABLE POPUP OPEN
-========================= */
-
-function openHubPopup(hub, lat, lng, distanceFromUser) {
-  const panel = document.getElementById("hubDetailsPanel");
-  const content = document.getElementById("hubDetailsContent");
-  const overlay = document.getElementById("mapOverlay");
-
-  if (!panel || !content || !overlay) return;
-
-  // STEP 1: inject HTML first
-  content.innerHTML = buildPopup(hub, lat, lng, distanceFromUser);
-
-  // STEP 2: force layout paint (THIS is what fixes mobile header issue)
-  panel.style.display = "block";
-  overlay.style.display = "block";
-
-  // STEP 3: ensure browser paints before visibility transition
-  setTimeout(() => {
-    panel.classList.remove("hidden");
-    overlay.classList.remove("hidden");
-  }, 0);
-}
-
-function closeHubPopup() {
-  const panel = document.getElementById("hubDetailsPanel");
-  const overlay = document.getElementById("mapOverlay");
-
-  if (panel) panel.classList.add("hidden");
-  if (overlay) overlay.classList.add("hidden");
-}
-
-/* ========================= */
 
 function bootApp() {
   updateDateTime();
@@ -151,29 +134,57 @@ function bootApp() {
   safeCall("initSidebarRail");
   safeCall("initFilterToolbar");
 
-  if (typeof initSearch !== "function") return;
-  if (typeof initClearFilters !== "function") return;
-  if (typeof loadHubData !== "function") return;
+  if (typeof initSearch !== "function") {
+    console.error("Critical boot error: initSearch is not defined.");
+    if (typeof showLoadError === "function") {
+      showLoadError("App boot failed: search module missing.");
+    }
+    return;
+  }
+
+  if (typeof initClearFilters !== "function") {
+    console.error("Critical boot error: initClearFilters is not defined.");
+    if (typeof showLoadError === "function") {
+      showLoadError("App boot failed: filter module missing.");
+    }
+    return;
+  }
+
+  if (typeof loadHubData !== "function") {
+    console.error("Critical boot error: loadHubData is not defined.");
+    if (typeof showLoadError === "function") {
+      showLoadError("App boot failed: data module missing.");
+    }
+    return;
+  }
 
   initSearch();
   initClearFilters();
   loadHubData();
 
-  if (typeof resetAllSections === "function") resetAllSections();
-  safeCall("initMapLayerControls");
+  if (typeof resetAllSections === "function") {
+    resetAllSections();
+  }
 
+  safeCall("initMapLayerControls");
   initFreshHomeWhenReady();
 
   bindMapToolButton("resetMapBtn", function() {
-    if (typeof resetMapView === "function") resetMapView();
+    if (typeof resetMapView === "function") {
+      resetMapView();
+    }
   });
 
   bindMapToolButton("myLocationBtn", function() {
-    if (typeof goToMyLocation === "function") goToMyLocation();
+    if (typeof goToMyLocation === "function") {
+      goToMyLocation();
+    }
   });
 
   bindMapToolButton("nearestHubBtn", function() {
-    if (typeof goToNearestHub === "function") goToNearestHub();
+    if (typeof goToNearestHub === "function") {
+      goToNearestHub();
+    }
   });
 
   initOverlayActions();
