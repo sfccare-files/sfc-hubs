@@ -1,3 +1,7 @@
+/* =========================
+   BUILD POPUP (V3)
+========================= */
+
 function buildPopup(hub, lat, lng, distanceFromUser) {
   const policeStation = hub.police_station || "";
   const zonalManager = hub.zonal || "";
@@ -35,8 +39,6 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
         <button
           class="inline-copy-btn"
           onclick='copyTextValue(${JSON.stringify(safeValue)}, ${JSON.stringify(label)}, this)'
-          aria-label="Copy ${label}"
-          title="Copy ${label}"
           ${safeValue ? "" : "disabled"}>
           ${copyIcon(label)}
         </button>
@@ -46,16 +48,34 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
 
   return `
     <div class="hub-popup">
-      <button
-        class="hub-favorite-btn"
-        onclick='toggleFavoriteFromPopup(${JSON.stringify(hub.name)})'
-        aria-label="Toggle favorite"
-        title="Toggle favorite">
-        ${favoriteIcon}
-      </button>
 
+      <!-- HEADER -->
+      <div class="hub-popup-header">
+        <div class="hub-header-title">
+          ${escapeHtmlText(hub.name || "Hub")}
+        </div>
+
+        <div class="hub-header-actions">
+          <button
+            class="hub-icon-btn"
+            onclick='toggleFavoriteFromPopup(${JSON.stringify(hub.name)})'
+            title="Favorite">
+            ${favoriteIcon}
+          </button>
+
+          <button
+            class="hub-icon-btn hub-close-btn"
+            onclick="closeHubPopup()"
+            title="Close">
+            ×
+          </button>
+        </div>
+      </div>
+
+      <!-- BODY -->
       <div class="hub-popup-body">
-        <h2 class="section-title">Hub Details</h2>
+
+        <div class="section-title">Hub Details</div>
 
         <div class="box"><b>Name:</b> ${escapeHtmlText(hub.name || "")}</div>
         <div class="box"><b>Address:</b> ${escapeHtmlText(hub.address || "")}</div>
@@ -81,9 +101,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
           <div class="box-copy-text"><b>Coordinates:</b> ${lat}, ${lng}</div>
           <button
             class="inline-copy-btn"
-            onclick="copyCoordinates(${lat}, ${lng}, this)"
-            aria-label="Copy Coordinates"
-            title="Copy Coordinates">
+            onclick="copyCoordinates(${lat}, ${lng}, this)">
             ${copyIcon("Coordinates")}
           </button>
         </div>
@@ -111,14 +129,18 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
           <div class="box"><b>Team Leader:</b> ${escapeHtmlText(teamLeader)}</div>
           ${phoneBox("Phone", teamLeaderPhone)}
         </div>
+
       </div>
 
+      <!-- FOOTER -->
       <div class="hub-popup-footer">
+
         <button class="direction-btn" onclick="openDirections(${lat},${lng})">
           📍 Get Directions
         </button>
 
-        <div class="hub-popup-secondary-actions">
+        <div class="hub-popup-secondary-actions ${getActionClass(preferredPhone, whatsappGroup)}">
+
           <button
             class="secondary-action-btn"
             onclick='callPhone(${JSON.stringify(preferredPhone)})'
@@ -130,7 +152,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
             class="secondary-action-btn"
             onclick='openWhatsappGroup(${JSON.stringify(whatsappGroup)})'
             ${isValidWhatsappGroupLink(whatsappGroup) ? "" : "disabled"}>
-            💬 Whatsapp
+            💬 WhatsApp
           </button>
 
           <button
@@ -138,11 +160,40 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
             onclick="copyCoordinates(${lat}, ${lng}, this)">
             🧭 Copy Coords
           </button>
+
         </div>
+
       </div>
     </div>
   `;
 }
+
+/* =========================
+   ACTION LOGIC
+========================= */
+
+function getActionClass(phone, whatsapp) {
+  const count =
+    (isCallablePhone(phone) ? 1 : 0) +
+    (isValidWhatsappGroupLink(whatsapp) ? 1 : 0) +
+    1;
+
+  if (count === 1) return "actions-1";
+  if (count === 2) return "actions-2";
+  return "actions-3";
+}
+
+function closeHubPopup() {
+  const panel = document.getElementById("hubDetailsPanel");
+  const overlay = document.getElementById("mapOverlay");
+
+  if (panel) panel.classList.add("hidden");
+  if (overlay) overlay.classList.add("hidden");
+}
+
+/* =========================
+   EXISTING FUNCTIONS (UNCHANGED)
+========================= */
 
 function toggleFavoriteFromPopup(hubName) {
   const hub = getState().allHubs.find(function(item) {
@@ -239,16 +290,12 @@ function showCopySuccess(triggerEl) {
   triggerEl.classList.add("copy-success");
 
   const tooltip = triggerEl.querySelector(".copy-tooltip");
-  if (tooltip) {
-    tooltip.textContent = "Copied";
-  }
+  if (tooltip) tooltip.textContent = "Copied";
 
   clearTimeout(triggerEl._copyTimer);
   triggerEl._copyTimer = setTimeout(function() {
     triggerEl.classList.remove("copy-success");
-    if (tooltip) {
-      tooltip.textContent = "Copy";
-    }
+    if (tooltip) tooltip.textContent = "Copy";
   }, 1000);
 }
 

@@ -1,3 +1,7 @@
+/* =========================
+   HUB POPUP V3 SYSTEM
+========================= */
+
 .hub-popup {
   position: fixed;
   inset: 0;
@@ -7,33 +11,42 @@
   background: rgba(255, 255, 255, 0.98);
   overflow: hidden;
   box-sizing: border-box;
+  animation: popupFadeIn 0.25s ease;
 }
+
+/* ================= HEADER ================= */
 
 .hub-popup-header {
   flex: 0 0 auto;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  padding: 16px 18px;
-  min-height: 72px;
-  box-sizing: border-box;
+  padding: 14px 16px;
+  min-height: 60px;
+  border-bottom: 1px solid rgba(15,23,42,0.08);
+  background: #ffffff;
+  z-index: 5;
+}
+
+.hub-header-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2937;
+  max-width: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .hub-header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 0 0 auto;
-  width: fit-content;
-  max-width: 100%;
 }
 
 .hub-icon-btn {
   width: 36px;
   height: 36px;
-  flex: 0 0 36px;
-  min-width: 36px;
-  max-width: 36px;
   border: none;
   border-radius: 999px;
   display: flex;
@@ -55,21 +68,14 @@
   transform: scale(0.95);
 }
 
-.hub-favorite-btn {
-  font-size: 15px;
-}
-
 .hub-close-btn {
   font-size: 18px;
-  background: #f1f5f9;
 }
 
-.hub-close-btn:hover {
-  background: #e2e8f0;
-}
+/* ================= BODY ================= */
 
 .hub-popup-body {
-  flex: 1 1 auto;
+  flex: 1;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
@@ -90,25 +96,16 @@
   background: transparent;
 }
 
+/* ================= CONTENT ================= */
+
 .section-title {
   text-align: center;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: #1f2937;
   padding-bottom: 10px;
   margin-bottom: 16px;
   border-bottom: 2px solid rgba(15, 23, 42, 0.14);
-}
-
-.title {
-  text-align: center;
-  font-size: 18px;
-  font-weight: 700;
-  color: #1f2937;
-  padding-bottom: 10px;
-  margin-bottom: 16px;
-  border-bottom: 2px solid rgba(15, 23, 42, 0.14);
-  padding-right: 80px;
 }
 
 .section {
@@ -134,6 +131,8 @@
   color: #344054;
 }
 
+/* COPY SYSTEM */
+
 .box-copy {
   display: flex;
   align-items: center;
@@ -149,9 +148,6 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 4px;
   opacity: 0.6;
   position: relative;
@@ -166,14 +162,11 @@
 .inline-copy-btn:disabled {
   opacity: 0.25;
   cursor: not-allowed;
-  transform: none;
 }
 
 .inline-copy-icon {
   width: 13px;
   height: 13px;
-  pointer-events: none;
-  transition: transform 0.18s ease;
 }
 
 .copy-tooltip {
@@ -187,9 +180,7 @@
   font-weight: 700;
   padding: 5px 7px;
   border-radius: 6px;
-  white-space: nowrap;
   opacity: 0;
-  pointer-events: none;
   transition: all 0.18s ease;
 }
 
@@ -199,112 +190,69 @@
   transform: translateX(-50%) translateY(0);
 }
 
-.inline-copy-btn.copy-success .inline-copy-icon {
-  transform: scale(1.15);
-}
+/* GRID */
 
 .grid2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 10px;
 }
 
-.grid2 .box {
-  margin-bottom: 0;
-}
+/* ================= FOOTER ================= */
 
 .hub-popup-footer {
   flex: 0 0 auto;
   padding: 14px 18px;
   background: rgba(248, 251, 252, 0.98);
   border-top: 1px solid rgba(15, 23, 42, 0.1);
-  z-index: 5;
 }
 
 .direction-btn {
   width: 100%;
   background: linear-gradient(135deg, #22c27a 0%, #169f64 100%);
   color: #fff;
-  padding: 13px 18px;
+  padding: 13px;
   font-size: 15px;
   font-weight: 700;
-  border: none;
   border-radius: 12px;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .direction-btn:hover {
   transform: translateY(-2px);
 }
 
-.direction-btn:active {
-  transform: translateY(0);
-}
-
-.direction-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-  filter: grayscale(0.15);
-}
+/* SMART ACTION GRID */
 
 .hub-popup-secondary-actions {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-top: 12px;
 }
 
+.actions-1 { grid-template-columns: 1fr; }
+.actions-2 { grid-template-columns: 1fr 1fr; }
+.actions-3 { grid-template-columns: repeat(3, 1fr); }
+
 .secondary-action-btn {
   border: 1px solid rgba(15, 23, 42, 0.1);
   background: #eef2f4;
-  color: #344054;
-  padding: 11px 12px;
+  padding: 11px;
   font-size: 13px;
   font-weight: 700;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-.secondary-action-btn:hover {
-  background: #e3e8eb;
-  transform: translateY(-1px);
 }
 
 .secondary-action-btn:disabled {
-  opacity: 0.42;
+  opacity: 0.4;
   cursor: not-allowed;
-  transform: none;
 }
 
-@media (max-width: 900px) {
-  .hub-popup-body {
-    padding: 16px;
-  }
+/* ================= ANIMATION ================= */
 
-  .hub-popup-footer {
-    padding: 12px 16px;
-  }
-
-  .hub-popup-secondary-actions {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .box {
-    font-size: 15px;
-    border-radius: 14px;
-  }
-
-  .section {
-    font-size: 16px;
-  }
-
-  .direction-btn {
-    padding: 15px 14px;
-  }
+@keyframes popupFadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
