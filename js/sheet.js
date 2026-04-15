@@ -183,6 +183,7 @@ function loadHubData() {
     download: true,
     header: true,
     skipEmptyLines: true,
+    crossOrigin: "anonymous",
     complete: function(results) {
       const rows = Array.isArray(results.data) ? results.data : [];
       const duplicateTracker = new Set();
