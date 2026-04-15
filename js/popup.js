@@ -1,5 +1,5 @@
 /* =========================
-   BUILD POPUP (V3)
+   BUILD POPUP (V3.6 FINAL)
 ========================= */
 
 function buildPopup(hub, lat, lng, distanceFromUser) {
@@ -132,14 +132,16 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
 
       </div>
 
-      <!-- FOOTER -->
+      <!-- FOOTER (UPDATED) -->
       <div class="hub-popup-footer">
 
-        <button class="direction-btn" onclick="openDirections(${lat},${lng})">
-          📍 Get Directions
-        </button>
+        <div class="hub-popup-secondary-actions ${getActionClassExtended(preferredPhone, whatsappGroup)}">
 
-        <div class="hub-popup-secondary-actions ${getActionClass(preferredPhone, whatsappGroup)}">
+          <button
+            class="secondary-action-btn"
+            onclick="openDirections(${lat},${lng})">
+            📍 Directions
+          </button>
 
           <button
             class="secondary-action-btn"
@@ -169,19 +171,24 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
 }
 
 /* =========================
-   ACTION LOGIC
+   UPDATED GRID LOGIC
 ========================= */
 
-function getActionClass(phone, whatsapp) {
+function getActionClassExtended(phone, whatsapp) {
   const count =
+    1 + // Directions always exists
     (isCallablePhone(phone) ? 1 : 0) +
     (isValidWhatsappGroupLink(whatsapp) ? 1 : 0) +
-    1;
+    1; // Copy always exists
 
-  if (count === 1) return "actions-1";
-  if (count === 2) return "actions-2";
-  return "actions-3";
+  if (count <= 2) return "actions-2";
+  if (count === 3) return "actions-3";
+  return "actions-4";
 }
+
+/* =========================
+   CLOSE SYSTEM
+========================= */
 
 function closeHubPopup() {
   const panel = document.getElementById("hubDetailsPanel");

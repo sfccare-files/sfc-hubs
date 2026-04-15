@@ -1,5 +1,5 @@
 /* =========================
-   HUB POPUP V3 SYSTEM
+   HUB POPUP V3.6 SYSTEM
 ========================= */
 
 .hub-popup {
@@ -208,46 +208,50 @@
 }
 
 .direction-btn {
-  width: 100%;
-  background: linear-gradient(135deg, #22c27a 0%, #169f64 100%);
-  color: #fff;
-  padding: 13px;
-  font-size: 15px;
-  font-weight: 700;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
+  display: none;
 }
 
-.direction-btn:hover {
-  transform: translateY(-2px);
-}
-
-/* SMART ACTION GRID */
+/* ✅ SMART ACTION GRID */
 
 .hub-popup-secondary-actions {
   display: grid;
   gap: 10px;
-  margin-top: 12px;
 }
 
+/* UPDATED GRID SUPPORT */
 .actions-1 { grid-template-columns: 1fr; }
 .actions-2 { grid-template-columns: 1fr 1fr; }
 .actions-3 { grid-template-columns: repeat(3, 1fr); }
+.actions-4 { grid-template-columns: repeat(2, 1fr); }
+
+/* BUTTONS */
 
 .secondary-action-btn {
   border: 1px solid rgba(15, 23, 42, 0.1);
   background: #eef2f4;
-  padding: 11px;
+  padding: 12px;
   font-size: 13px;
   font-weight: 700;
   border-radius: 12px;
   cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+/* 🔥 subtle hierarchy for Directions (without size change) */
+.secondary-action-btn:first-child {
+  background: linear-gradient(135deg, #22c27a 0%, #169f64 100%);
+  color: #fff;
+  border: none;
+}
+
+.secondary-action-btn:hover {
+  transform: translateY(-1px);
 }
 
 .secondary-action-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* ================= ANIMATION ================= */
