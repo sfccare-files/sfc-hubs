@@ -215,7 +215,7 @@
 /* ✅ FIXED 2x2 GRID */
 .hub-popup-secondary-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* ALWAYS 2 columns */
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
@@ -232,7 +232,6 @@
   transition: all 0.18s ease;
 }
 
-/* Directions highlight (no size difference) */
 .secondary-action-btn:first-child {
   background: linear-gradient(135deg, #22c27a 0%, #169f64 100%);
   color: #fff;
@@ -254,4 +253,35 @@
 @keyframes popupFadeIn {
   from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
+}
+
+/* =========================
+   MOBILE HEADER FIX (FINAL PATCH)
+========================= */
+
+@media (max-width: 768px) {
+
+  .hub-popup {
+    height: 100dvh;
+  }
+
+  .hub-popup-header {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: #ffffff;
+  }
+
+  .hub-header-title {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hub-header-actions {
+    flex-shrink: 0;
+  }
+
+  .hub-icon-btn {
+    flex-shrink: 0;
+  }
 }
