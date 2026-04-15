@@ -135,7 +135,7 @@ function buildPopup(hub, lat, lng, distanceFromUser) {
       <!-- FOOTER (UPDATED) -->
       <div class="hub-popup-footer">
 
-        <div class="hub-popup-secondary-actions ${getActionClassExtended(preferredPhone, whatsappGroup)}">
+        <div class="hub-popup-secondary-actions">
 
           <button
             class="secondary-action-btn"
